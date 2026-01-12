@@ -41,5 +41,3 @@ CREATE TABLE stores (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_stores_merchant ON stores(merchant_id);
-
-afafas
