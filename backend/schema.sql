@@ -32,6 +32,9 @@ CREATE TABLE stores (
     longitude DECIMAL(11, 8) NOT NULL,
     phone VARCHAR(20),
     operating_hours VARCHAR(255),
+    bank_account_number VARCHAR(50),
+    qris_image_url VARCHAR(500),
+    id_card_image_url VARCHAR(500),
     is_active BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -41,3 +44,13 @@ CREATE TABLE stores (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_stores_merchant ON stores(merchant_id);
+
+-- INSERT INTO users (email, password, name, phone, role, is_verified) 
+-- VALUES (
+--     'admin@bakery.com', 
+--     '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+--     'Admin', 
+--     '081234567890', 
+--     'admin', 
+--     true
+-- );

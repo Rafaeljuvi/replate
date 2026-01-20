@@ -17,10 +17,16 @@ const verifyToken = (req, res, next) => {
             req.user = decoded;
             next();
         } catch (error){
+            if (error.name === 'TokenExpiredError') {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Token has expired. Please Relogin'
+                });
+            }
             return res.status(401).json({
                 success: false,
                 message: 'Invalid token.'
-            });
+            })
         }
 };
 
@@ -30,7 +36,7 @@ const checkRole = (...allowedRoles) =>{
         if(!allowedRoles.includes(req.user.role)){
             return res.status(403).json({
                 success: false,
-                message: 'Acess forbidden. You do not have the required role.'
+                message: 'Access forbidden. You do not have the required role.'
             });
         }
         next();

@@ -10,13 +10,18 @@ const isValidPassword = (password) => {
 };
 
 //Phone Number Validation(ID)
-const isValidPhoneNumber = (phoneNumber) => {
-    const phoneRegex = /^(\+62|62|0) [0-9]{9,12}$/;
-    return !phoneNumber || phoneRegex.test(phoneNumber)
+const isValidPhoneNumber = (phone) => {
+    const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/;
+    return !phone|| phoneRegex.test(phone)
+};
+
+const isPasswordMatch = (password, confirmPassword) => {
+    return password === confirmPassword;
 };
 
 module.exports = {
     isValidEmail,
     isValidPassword,
-    isValidPhoneNumber
+    isValidPhoneNumber,
+    isPasswordMatch
 };
