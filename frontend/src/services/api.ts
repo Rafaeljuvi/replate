@@ -10,6 +10,7 @@ import type {
     ForgotPasswordData,
     ResetPasswordData,
     User,
+    Store
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
@@ -133,5 +134,12 @@ export const getProfile = async (): Promise<User> => {
 const { data } = await api.get<ApiResponse<{ user: User }>>('/auth/profile');
 return data.data!.user;
 };
+
+export const getMerchantStore = async(): Promise<Store> =>{
+    const {data} = await api.get('/merchant/store');
+    return data.data;
+}
+
+
 
 export default api;

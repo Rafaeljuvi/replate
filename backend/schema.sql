@@ -40,6 +40,26 @@ CREATE TABLE stores (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tambahan untuk stores table
+ALTER TABLE stores
+ADD COLUMN IF NOT EXISTS approval_status VARCHAR(50) DEFAULT 'pending';
+
+ALTER TABLE stores
+ADD COLUMN IF NOT EXISTS admin_notes TEXT;
+
+ALTER TABLE stores
+ADD COLUMN IF NOT EXISTS approved_at TIMESTAMP;
+
+ALTER TABLE stores
+ADD COLUMN IF NOT EXISTS approved_by UUID REFERENCES users(user_id);
+
+UPDATE stores
+SET approval_status = 'approved', is_active = true
+WHERE approval_status IS NULL OR approval_status = '';
+
+CREATE INDEX IF NOT EXISTS idx_stores_approval_status ON stores(approval_status)
+
+
 -- Indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);

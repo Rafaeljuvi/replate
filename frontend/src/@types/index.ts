@@ -89,6 +89,10 @@ export interface Store{
     qris_image_url?: string;
     id_card_image_url?: string;
     is_active: boolean;
+    approval_status: 'pending' | 'approved' | 'rejected';
+    admin_notes?: string;
+    approved_at?: string;
+    approved_by?: string;
     created_at: string;
     updated_at?: string;
 }
