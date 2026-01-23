@@ -5,12 +5,12 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth:{
         user:process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASS
     },
 });
 
 //Send verification email 
-const sendverificationEmail = async (email, name, verificationToken, userType = 'user') => {
+const sendVerificationEmail = async (email, name, verificationToken, userType = 'user') => {
     const verificationUrl= `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
     //Different message based on user type
@@ -75,7 +75,7 @@ const sendverificationEmail = async (email, name, verificationToken, userType = 
 
 //resend Verfification Email
 const resendVerificationEmail = async (email, name, verificationToken, userType = 'user') => {
-    return await sendverificationEmail(email, name, verificationToken, userType);
+    return await sendVerificationEmail(email, name, verificationToken, userType);
 };
 
 //Send forget password reset email
@@ -148,7 +148,7 @@ const sendPasswordResetEmail = async (email, name, resetToken) =>{
 
 
 module.exports = {
-    sendverificationEmail,
+    sendVerificationEmail,
     resendVerificationEmail,
     sendPasswordResetEmail
 };

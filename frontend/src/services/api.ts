@@ -13,7 +13,12 @@ import type {
     Store
 } from '../@types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+
+console.log('===== API CONFIGURATION =====');
+console.log('VITE_API_BASE_URL from env:', import.meta.env.VITE_API_BASE_URL);
+console.log('API_BASE_URL being used:', API_BASE_URL);
+console.log('============================');
 
 const api = axios.create({
     baseURL: API_BASE_URL,

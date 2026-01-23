@@ -8,7 +8,7 @@ const {
     isPasswordMatch
 } = require('../utils/validation');
 const {
-    sendverificationEmail,
+    sendVerificationEmail,
     resendVerificationEmail,
     sendPasswordResetEmail
 } = require('../utils/emailservice');
@@ -83,7 +83,7 @@ const registerUser = async (req, res) => {
             role: newUser.role
         },
         process.env.JWT_SECRET,
-        {expiresIn: process.env.JWT_EXPIRE});
+        {expiresIn: '7d'});
 
         //generate verification token
         const verificationToken = jwt.sign(
@@ -97,7 +97,7 @@ const registerUser = async (req, res) => {
         );
 
         //send verification email
-        const emailSent = await sendverificationEmail(
+        const emailSent = await sendVerificationEmail(
             newUser.email,
             newUser.name,
             verificationToken,
@@ -194,7 +194,7 @@ const RegisterMerchant = async (req, res) => {
             role: newUser.role,
         },
          process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRE}
+            expiresIn: '7d'}
         );
 
         res.status(201).json({
@@ -330,7 +330,7 @@ const registerStoreVerification = async (req, res) => {
                 { expiresIn: '24h' }
             );
 
-            emailSent = await sendverificationEmail(
+            emailSent = await sendVerificationEmail(
                 user.email,
                 user.name,
                 verificationToken,
@@ -402,7 +402,7 @@ const login = async (req, res) => {
             role: user.role
         },
             process.env.JWT_SECRET,
-            {expiresIn: process.env.JWT_EXPIRE}
+            {expiresIn: '7d'}
         );   
 
         //Return user data withthout password
