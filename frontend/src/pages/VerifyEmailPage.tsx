@@ -6,6 +6,7 @@ import { verifyEmail, resendVerification } from '../services/api';
 import AuthLayout from '../components/layout/AuthLayout';
 import Button from '../components/ui/Button';
 
+
 type VerificationState = 'loading' | 'success' | 'error' | 'already-verified';
 
 export default function VerifyEmailPage() {
@@ -15,8 +16,24 @@ export default function VerifyEmailPage() {
   const [countdown, setCountdown] = useState(3);
   const [errorMessage, setErrorMessage] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [email, setEmail] = useState('');
+  const [showEmailInput, setShowEmailInput] = useState(false);
 
   const token = searchParams.get('token');
+  const status = searchParams.get('status')
+
+  useEffect(() => {
+    if(status === 'success && !token'){
+      setState('success');
+      return;
+    }
+
+    if(!token) {
+      setState('error');
+      setErrorMessage('Verification token is missing')
+      return;
+    }
+  })
 
   // Auto-verify on mount
   useEffect(() => {
@@ -70,19 +87,28 @@ export default function VerifyEmailPage() {
 
   // Resend verification
   const handleResend = async () => {
-    const email = prompt('Please enter your email address:');
-    if (!email) return;
+    if (!showEmailInput) {
+      setShowEmailInput(true);
+      return;
+    }
+
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
 
     try {
       setIsResending(true);
       await resendVerification(email);
       toast.success('Verification email sent! Please check your inbox.');
+      setShowEmailInput(false);
+      setEmail('');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to resend verification email');
     } finally {
       setIsResending(false);
     }
-  };
+  }
 
   // Loading state
   if (state === 'loading') {

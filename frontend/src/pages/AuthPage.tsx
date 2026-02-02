@@ -1,24 +1,33 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import {  useForm } from 'react-hook-form';
 import { Mail, Lock, User, Phone, CheckCircle } from 'lucide-react';
+import type {CredentialResponse } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
-import { login, getMerchantStore, registerCustomer } from '../services/api';
+import { login, getMerchantStore, registerCustomer, googleAuth, resendVerification } from '../services/api';
 import AuthLayout from '../components/layout/AuthLayout';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import type { LoginCredentials, RegisterCustomerData } from '../@types';
+import type { LoginCredentials, RegisterCustomerData} from '../@types';
+
 
 type TabType = 'signin' | 'register';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('signin');
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const { login: authLogin } = useAuth();
+  
+  //State untuk unverified email
+  const [showResendVerfication, setShowResendVerification] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const[isResending, setIsResending] = useState(false);
+  
 
   // Form for Sign In
   const {
@@ -36,6 +45,112 @@ export default function LoginPage() {
   } = useForm<RegisterCustomerData>();
 
   const password = watch('password');
+
+  //Google Auth Handler Log In
+  const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
+    try {
+      setIsLoading(true);
+
+      if(!credentialResponse.credential){
+        toast.error('Failed to get Google credentials. Please try again.');
+        return;
+      }
+
+      const response = await googleAuth(credentialResponse.credential, 'signin');
+
+      authLogin(response.user, response.token);
+      toast.success('Login succesful with Google!')
+
+      if(response.isNewUser){
+        toast.error('No account found. Please register first.');
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return;
+      }
+
+      //User existing
+      authLogin(response.user, response.token);
+      toast.success('Login successful with Google!');
+
+      if (response.user.role === 'user') {
+        navigate('/dashboard');
+      }else if(response.user.role === 'merchant'){
+        try {
+          const store = await getMerchantStore();
+          if(store.approval_status === 'pending'){
+            navigate('/merchant/pending-approval');
+          } else if (store.approval_status === 'approved'){
+            navigate('/merchant/dashboard');
+          }else if(store.approval_status === 'rejected'){
+            navigate('/merchant/rejected');
+          }
+
+        } catch (error) {
+          navigate('/merchant/pending-approval');
+        }
+      }else if(response.user.role === 'admin'){
+        navigate('/admin/dashboard');
+      }
+    } catch (error:any) {
+      console.error('Google auth error:', error);
+      toast.error(error.response?.data?.message || 'Google authentication failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //Google Register
+  const handleGoogleRegister = async(credentialResponse: CredentialResponse) => {
+    try {
+      setIsLoading(true);
+
+      if(!credentialResponse.credential){
+        toast.error('Failed to get Google credentials. Please try again.');
+        return;
+      }
+
+      const response = await googleAuth(credentialResponse.credential, 'register');
+
+      authLogin(response.user, response.token);
+
+      if (response.isNewUser){
+        toast.success('Registration successful with Google!');
+      } else{
+        toast.success('Welcome back! Logged in with Google.');
+      }
+
+      // Redirect based on role
+      if (response.user.role === 'user') {
+        navigate('/dashboard');
+      } else if (response.user.role === 'merchant') {
+        try {
+          const store = await getMerchantStore();
+          if (store.approval_status === 'pending') {
+            navigate('/merchant/pending-approval');
+          } else if (store.approval_status === 'approved') {
+            navigate('/merchant/dashboard');
+          } else if (store.approval_status === 'rejected') {
+            navigate('/merchant/rejected');
+          }
+        } catch (error) {
+          navigate('/merchant/pending-approval');
+        }
+      } else if (response.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      }
+
+    } catch (error:any) {
+      console.error('Google register error:', error);
+      toast.error(error.response?.data?.message || 'Google registration failed');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleGoogleError = () => {
+    toast.error('Google authentication was unsuccessful. Please try again.');
+  }
 
   // Sign In Handler
   const onSubmitSignIn = async (data: LoginCredentials) => {
@@ -77,6 +192,10 @@ export default function LoginPage() {
         toast.error('Incorrect password. Please try again.');
       } else if (status === 403) {
         toast.error('Please verify your email before logging in. Check your inbox.');
+      } else if (status === 402) {
+        toast.error('User Not found');
+        setUnverifiedEmail(data.email);
+        setShowResendVerification(true);
       } else {
         toast.error(message || 'Login failed. Please try again.');
       }
@@ -146,9 +265,53 @@ export default function LoginPage() {
           >
             Go to Login
           </Button>
+
+          <div className='mt-4'>
+            <p className='text-sm text-gray-600'>
+              Didn't receive verification email?{' '}
+              <button
+                onClick={async () => {
+                  try {
+                    setIsResending(true);
+                    await resendVerification(registeredEmail);
+                    toast.success('Verification email resent! Please check your inbox.');
+                  } catch (error: any) {
+                    toast.error('Failed to resend email. Please try again.')
+                  } finally{
+                    setIsResending(false);
+                  }
+                }}
+                disabled={isResending}
+                className='text-primary hover:text-primary-dark font-semibold disabled:opacity-50'
+                >
+                  {isResending ? 'Sending...' : 'Resend verification email'}
+              </button>
+            </p>
+          </div>
         </div>
       </AuthLayout>
     );
+  }
+
+  // Resend Verification email Handler
+  const handlerResendVerfication = async() => {
+    if(!unverifiedEmail){
+      toast.error('User Not found.');
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      await resendVerification(unverifiedEmail);
+      toast.success('Verification email resent! Please check your inbox.');
+      setShowResendVerification(false);
+      setUnverifiedEmail('');
+    } catch (error:any) {
+      console.error('Resend verification error: ', error);
+      toast.error(error.response?.data?.message || 'Failes to resend verification email. Please try again.');
+    } finally{
+      setIsResending(false);
+    }
   }
 
   return (
@@ -184,6 +347,29 @@ export default function LoginPage() {
         <>
           <h2 className="text-2xl font-bold text-gray-800 mb-2 text-center">Welcome Back</h2>
           <p className="text-gray-600 text-sm text-center mb-6">Sign in to continue to Replate</p>
+
+          {showResendVerfication && (
+            <div className='mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
+              <p className=' text-sm text-yellow-800 mb-2'>
+                <strong>Email not verified</strong>
+              </p>
+              <p className='text-xs text-yellow-700 mb-3'>
+                Please Check your inbox for the verification email sent to{' '}
+                <span className='font-semibold'>
+                  {unverifiedEmail}
+                </span>
+                <Button
+                 variant= "outline"
+                 size='small'
+                 fullWidth
+                 onClick={handlerResendVerfication}
+                 isLoading={isResending}
+                 >
+                  {isResending ? 'Resending...' : 'Resend Verification Email'}
+                </Button>
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmitSignIn(onSubmitSignIn)} className="space-y-4">
             <Input
@@ -238,27 +424,17 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button variant="outline" size="medium" fullWidth disabled>
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Google
-            </Button>
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                size="large"
+                text="signin_with"
+                width="384"
+              />
+            </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
@@ -366,31 +542,6 @@ export default function LoginPage() {
               })}
             />
 
-            {/* Terms & Conditions */}
-            {/* <div className="flex items-start gap-2">
-              <input
-                type="checkbox"
-                id="terms"
-                className="mt-1"
-                {...registerForm('terms' as any, {
-                  required: 'You must accept the terms and conditions'
-                })}
-              />
-              <label htmlFor="terms" className="text-sm text-gray-600">
-                I agree to the{' '}
-                <a href="#" className="text-primary hover:text-primary-dark font-semibold">
-                  Terms and Conditions
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-primary hover:text-primary-dark font-semibold">
-                  Privacy Policy
-                </a>
-              </label>
-            </div>
-            {errorsRegister.terms && (
-              <p className="text-sm text-red-500 -mt-2">{(errorsRegister.terms as any).message}</p>
-            )} */}
-
             {/* Register Button */}
             <Button type="submit" variant="primary" size="medium" fullWidth isLoading={isLoading}>
               {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -407,9 +558,17 @@ export default function LoginPage() {
             </div>
 
             {/* Social Register */}
-            <Button variant="outline" size="medium" fullWidth disabled>
-              Google
-            </Button>
+            <div className="flex justify-center w-ful">
+              <GoogleLogin
+                onSuccess={handleGoogleRegister}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                size="large"
+                text="signin_with"
+                width="384"
+              />
+            </div>
 
             {/* Links */}
             <p className="text-center text-sm text-gray-600 mt-4">

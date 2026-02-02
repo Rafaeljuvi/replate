@@ -6,7 +6,7 @@ import './index.css'
 // ========================================
 // PUBLIC PAGES (Auth)
 // ========================================
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/AuthPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 

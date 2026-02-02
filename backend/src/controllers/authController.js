@@ -13,6 +13,98 @@ const {
     sendPasswordResetEmail
 } = require('../utils/emailservice');
 
+const googleAuth = async (req, res) =>{
+    try {
+        const {credential, mode} = req.body;
+        if(!credential) {
+            return res.status(400).json({
+                success: false,
+                message: 'Google Credential is required.'
+            });
+        }
+
+        //decode Google JWT Token
+        const jwt = require('jsonwebtoken');
+        const decodedToken = jwt.decode(credential);
+
+        if (!decodedToken){
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Google Credential.'
+            });
+        }
+
+        const { email, name, picture, sub: googleId } = decodedToken;
+
+        //check if user exists
+        let userExists = await pool.query(
+            'SELECT * FROM users WHERE email = $1',[email]
+        );
+
+        let user;
+        let isNewUser = false;
+
+        if (userExists.rows.length === 0){
+            // Jika mode = signin/login user.length == 00 return error
+            if( mode === 'signin') {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User not found. Please register first.',
+                    isNewUser: true
+                });
+            }
+
+            // create account if mode == register
+            if (mode === 'register'){
+                const result = await pool.query(
+                    `INSERT INTO users (email, password, name, phone, role, is_verified, google_id) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7) 
+                     RETURNING user_id, email, name, phone, role, is_verified, created_at`,
+                    [email, 'GOOGLE_AUTH', name, 'N/A', 'user', true, googleId]
+                );
+                user = result.rows [0];
+                isNewUser = true;
+            }
+        }else {
+            user = userExists.rows[0];
+
+            if(!user.google_id){
+                await pool.query(
+                    'UPDATE users SET google_id = $1, is_verified = true WHERE user_id = $2', [googleId, user.user_id]
+                );
+            }
+        }
+
+        const token = jwt.sign({
+            userId: user.user_id,
+            email: user.email,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+        {expiresIn: '7d'});
+
+        //return user data without password
+        const { password: _, ...userData} = user;
+
+        res.status(200).json({
+            success: true,
+            message: isNewUser ? 'Account created successfully with Google.' : 'Login successful with Google.',
+            data: {
+                user: userData,
+                token,
+                isNewUser
+            }
+        });
+
+    } catch (error) {
+        console.error('Google Auth Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error.'
+        })
+    }
+}
+
 // User Registration
 const registerUser = async (req, res) => {
     try{
@@ -59,7 +151,7 @@ const registerUser = async (req, res) => {
         );
 
         if(userExists.rows.length > 0){
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 message: 'Email is already registered.'
             });
@@ -170,7 +262,7 @@ const RegisterMerchant = async (req, res) => {
         );
 
         if (userExists.rows.length > 0){
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 message: 'Email is already registered.'
             });
@@ -280,6 +372,22 @@ const registerStoreVerification = async (req, res) => {
         const merchantID = req.user.userId;
         const {bankAccountNumber} = req.body;
 
+        let qrisImageUrl = null;
+        let idCardImageUrl = null;
+
+       if(req.files && req.files.length > 0){
+         req.files.forEach(file => {
+            
+            if(file.fieldname === 'qrisImage') {
+                qrisImageUrl = `/uploads/${file.filename}`
+            }
+
+            if (file.fieldname === 'idCardImage'){
+                idCardImageUrl = `/uploads/${file.filename}`;
+            }
+         });
+       }
+
         if(!bankAccountNumber){
             return res.status(400).json({
                 success: false,
@@ -289,9 +397,12 @@ const registerStoreVerification = async (req, res) => {
 
 
         const result = await pool.query(
-            `UPDATE stores SET bank_account_number = $1
-            WHERE merchant_id = $2
-            RETURNING *`, [bankAccountNumber, merchantID]
+            `UPDATE stores SET bank_account_number = $1,
+            qris_image_url = $2,
+            id_card_image_url = $3,
+            updated_at = CURRENT_TIMESTAMP
+            WHERE merchant_id = $4
+            RETURNING *`, [bankAccountNumber,qrisImageUrl, idCardImageUrl, merchantID]
         );
 
         if (result.rows.length === 0) {
@@ -301,7 +412,7 @@ const registerStoreVerification = async (req, res) => {
             });
         }
 
-//Get merchant user info
+        //Get merchant user info
         const userResult = await pool.query(
             'SELECT user_id, email, name, is_verified FROM users WHERE user_id = $1', [merchantID]
         );
@@ -320,6 +431,7 @@ const registerStoreVerification = async (req, res) => {
         let verificationToken = null;
 
         if (!user.is_verified) {
+            const jwt = require('jsonwebtoken')
             verificationToken = jwt.sign(
                 {
                     userId: user.user_id,
@@ -330,6 +442,7 @@ const registerStoreVerification = async (req, res) => {
                 { expiresIn: '24h' }
             );
 
+            const { sendVerificationEmail } = require('../utils/emailservice');
             emailSent = await sendVerificationEmail(
                 user.email,
                 user.name,
@@ -377,7 +490,7 @@ const login = async (req, res) => {
         );
 
         if (result.rows.length === 0){
-            return res.status(401).json({
+            return res.status(402).json({
                 success:false,
                 message:'User not found, please register.'
             });
@@ -392,6 +505,14 @@ const login = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password.'
+            });
+        }
+
+        //Check if email is verified
+        if(!user.is_verified){
+            return res.status(403).json({
+                success: false,
+                message: 'Please verify your email to activate your account.'
             });
         }
 
@@ -634,9 +755,9 @@ const forgotPassword = async (req, res) =>{
         );
 
         if (result.rows.length === 0){
-            return res.status(200).json({
-                success: true,
-                message: 'Email has not registered'
+            return res.status(404).json({
+                success: false,
+                message: 'Account has not registered'
             });
         }
 
@@ -782,7 +903,8 @@ module.exports = {
     verifyEmail,
     resendVerification,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    googleAuth
 };
 
 

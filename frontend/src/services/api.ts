@@ -10,7 +10,8 @@ import type {
     ForgotPasswordData,
     ResetPasswordData,
     User,
-    Store
+    Store,
+    GoogleAuthResponse
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -95,10 +96,10 @@ export const registerMerchantStep1 = async (userData: RegisterMerchantStep1Data)
     return data.data!;
   };
 
-export const registerMerchantStep2 = async (storeData: RegisterMerchantStep2Data) => {
-const { data } = await api.post<ApiResponse>('/auth/register/store/info', storeData);
-return data.data;
-};
+  export const registerMerchantStep2 = async (storeData: any) => {
+    const { data } = await api.post<ApiResponse>('/auth/register/store/info', storeData);
+    return data.data;
+  };
   
 export const registerMerchantStep3 = async (verificationData: RegisterMerchantStep3Data) => {
 const formData = new FormData();
@@ -143,6 +144,11 @@ return data.data!.user;
 export const getMerchantStore = async(): Promise<Store> =>{
     const {data} = await api.get('/merchant/store');
     return data.data;
+}
+
+export const googleAuth = async(credential: string, mode: 'signin' | 'register') : Promise<GoogleAuthResponse> =>{
+    const {data} = await api.post<ApiResponse<GoogleAuthResponse>>('/Auth/google', {credential, mode});
+    return data.data!;
 }
 
 

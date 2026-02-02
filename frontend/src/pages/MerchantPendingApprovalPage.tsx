@@ -1,5 +1,22 @@
+import { logout } from "../services/api";
+
 export default function MerchantPendingApprovalPage() {
+    const user = { name: 'John Doe' }; // Replace with actual user data or context
     return (
+      <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Simple Header with Logout */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <p className="text-sm text-gray-500">Welcome, {user?.name}</p>
+          </div>
+          <button 
+            onClick={logout}
+            className="text-sm text-red-600 hover:text-red-700 underline"
+          >
+            Logout
+          </button>
+        </div>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
@@ -17,5 +34,7 @@ export default function MerchantPendingApprovalPage() {
           </div>
         </div>
       </div>
+    </div>
+    </div>
     );
   }

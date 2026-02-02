@@ -7,7 +7,7 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
-  isAuthenticated: boolean;  // ← FIX: typo (was isAutenticated)
+  isAuthenticated: boolean; 
   isLoading: boolean;
 }
 
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {  // ← FIX: chi
         isLoading,
       }}
     >
-      {children}  {/* ← FIX: lowercase children */}
+      {children}  
     </AuthContext.Provider>
   );
 }

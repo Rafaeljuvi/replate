@@ -35,8 +35,7 @@ export interface RegisterMerchantStep2Data{
     description: string;
     address: string;
     city: string;
-    latitude: number;
-    longitude: number;
+    location: { lat: number; lng: number };
     phone: string;
     operatingHours: string;
 }
@@ -105,3 +104,10 @@ export interface LatLng{
 
 //tab types
 export type AuthTab = 'signin' | 'register';
+
+//google login
+export interface GoogleAuthResponse {
+    user: User;
+    token: string;
+    isNewUser: boolean;
+}
