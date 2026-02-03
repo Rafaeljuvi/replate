@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const storeRoutes = require('./routes/storeRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 const app = express()
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 //Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', storeRoutes);
+app.use('/api/admin', adminRoutes); 
 
 //API check
 app.get('/', (req, res) => {
