@@ -69,6 +69,13 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_stores_merchant ON stores(merchant_id);
 
+--Tambahin average rating dan total rating
+ALTER TABLE stores 
+ADD COLUMN IF NOT EXISTS average_rating DECIMAL(2,1) DEFAULT (0.0);
+
+ALTER TABLE stores
+ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
+
 -- INSERT INTO users (email, password, name, phone, role, is_verified) 
 -- VALUES (
 --     'admin@bakery.com', 

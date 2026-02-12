@@ -62,6 +62,63 @@ const getMerchantStore = async(req,res) => {
     }
 };
 
+const getMerchantStoreStats = async (req, res) => {
+    try {
+        const merchantId = req.user.userId;
+
+        //Verify user's role is merchant
+        if(req.user.role !== 'merchant'){
+            return res.status(403).json({
+                success: false,
+                message: 'Access forbidden. Merchant only'
+            })
+        }
+
+        //Get merchant store
+        const storeResult = await pool.query(
+            'SELECT store_id, average_rating, total_ratings FROM stores WHERE merchant_id = $1',
+            [merchantId]
+        )
+
+        if(storeResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Store not found'
+            });
+        }
+
+        const storeId = storeResult.rows[0].store_id
+
+        //get statistics
+        const statsResult = await pool.query(
+            `SELECT
+            0 AS total_products,
+            0 AS active_products,
+            0 AS total_orders,
+            0 AS pending_orders,
+            0 AS completed_orders,
+            0 AS total_revenue,
+            COALESCE(s.average_rating, 0) AS average_rating,
+            COALESCE(s.total_ratings, 0) AS total_ratings
+            FROM stores s WHERE s.store_id = $1`,
+            [storeId]
+        )
+
+        res.status(200).json({
+            success:true,
+            data: statsResult.rows[0]
+        });
+
+    } catch (error) {
+        console.error('Get merchant store stats error:', error)
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        })
+    }
+}
+
 module.exports = {
-    getMerchantStore
+    getMerchantStore,
+    getMerchantStoreStats
 };

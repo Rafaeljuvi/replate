@@ -10,7 +10,8 @@ import type {
     ResetPasswordData,
     User,
     Store,
-    GoogleAuthResponse
+    GoogleAuthResponse,
+    MerchantStats
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -143,6 +144,11 @@ return data.data!.user;
 export const getMerchantStore = async(): Promise<Store> =>{
     const {data} = await api.get('/merchant/store');
     return data.data;
+}
+
+export const getMerchantStoreStats = async (): Promise<MerchantStats> => {
+    const {data} = await api.get<ApiResponse<MerchantStats>>('/merchant/store/stats')
+    return data.data!
 }
 
 export const googleAuth = async(credential: string, mode: 'signin' | 'register') : Promise<GoogleAuthResponse> =>{

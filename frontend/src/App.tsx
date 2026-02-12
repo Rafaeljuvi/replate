@@ -3,9 +3,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import './index.css'
 
-// ========================================
+
 // PUBLIC PAGES (Auth)
-// ========================================
 import LoginPage from './pages/AuthPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -13,27 +12,23 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import RegisterMerchantPage from './pages/RegisterMerchantPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 
-// ========================================
+
 // CUSTOMER PAGES
-// ========================================
 import CustomerDashboard from './pages/CustomerDashboard';
 import MyRatingsPage from './pages/MyRatingsPage';
 import StoreReviewsPage from './pages/StoreReviewsPage';
 
-// ========================================
 // MERCHANT PAGES
-// ========================================
 import MerchantDashboard from './pages/MerchantDashboard';
 import MerchantPendingApprovalPage from './pages/MerchantPendingApprovalPage';
 
-// ========================================
+
 // ADMIN PAGES
-// ========================================
 import AdminDashboard from './pages/AdminDashboard';
 
-// ========================================
+
 // PROTECTED ROUTE COMPONENT
-// ========================================
+
 import ProtectedRoute from './components/ProtectedRoute';
 
 import ComponentTestPage from './pages/ComponentTestPage';

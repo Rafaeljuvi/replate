@@ -111,3 +111,15 @@ export interface GoogleAuthResponse {
     token: string;
     isNewUser: boolean;
 }
+
+export interface MerchantStats {
+    total_products: number;
+    active_products: number;
+    total_orders: number;
+    pending_orders: number;
+    completed_orders: number;
+    total_revenue: number;
+    average_rating: number;
+    total_ratings: number;
+}
+
