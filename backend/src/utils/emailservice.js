@@ -259,20 +259,8 @@ const sendMerchantRejectionEmail = async (email, name, storeName, rejectionReaso
                     <h4 style="color: #2D7A5E; margin: 0 0 10px 0;">What You Can Do:</h4>
                     <ul style="color: #333; line-height: 1.8; margin: 0; padding-left: 20px;">
                         <li>Review the feedback above</li>
-                        <li>Contact our support team for clarification</li>
-                        <li>Update your information and reapply (coming soon)</li>
+                        <li>Reapply in a few minutes</li>
                     </ul>
-                </div>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${loginUrl}" 
-                       style="display: inline-block; padding: 14px 28px; background-color: #2D7A5E; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-right: 10px;">
-                        View Details
-                    </a>
-                    <a href="mailto:support@replate.com" 
-                       style="display: inline-block; padding: 14px 28px; background-color: #757575; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                        Contact Support
-                    </a>
                 </div>
 
                 <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">

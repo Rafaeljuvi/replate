@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { verifyToken } = require('../middleware/authMiddleware');
 
-// checkAdmin inline — tidak pakai file terpisah
+// checkAdmin 
 const checkAdmin = (req, res, next) => {
     if (!req.user || req.user.role !== 'admin') {
         return res.status(403).json({

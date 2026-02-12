@@ -167,13 +167,14 @@ export default function LoginPage() {
         try {
           const store = await getMerchantStore();
 
+          console.log('Full store object:', store);
+          console.log('Approval status:', store.approval_status);
+          console.log('===========================');
           if (store.approval_status === 'pending') {
             navigate('/merchant/pending-approval');
           } else if (store.approval_status === 'approved') {
             navigate('/merchant/dashboard');
-          } else if (store.approval_status === 'rejected') {
-            navigate('/merchant/rejected');
-          }
+          } 
         } catch (error) {
           navigate('/merchant/pending-approval');
         }
@@ -192,8 +193,6 @@ export default function LoginPage() {
         toast.error('Incorrect password. Please try again.');
       } else if (status === 403) {
         toast.error('Please verify your email before logging in. Check your inbox.');
-      } else if (status === 402) {
-        toast.error('User Not found');
         setUnverifiedEmail(data.email);
         setShowResendVerification(true);
       } else {
@@ -353,7 +352,7 @@ export default function LoginPage() {
               <p className=' text-sm text-yellow-800 mb-2'>
                 <strong>Email not verified</strong>
               </p>
-              <p className='text-xs text-yellow-700 mb-3'>
+              <p className='text-xs text-yellow-700 mb-2'>
                 Please Check your inbox for the verification email sent to{' '}
                 <span className='font-semibold'>
                   {unverifiedEmail}
@@ -364,6 +363,7 @@ export default function LoginPage() {
                  fullWidth
                  onClick={handlerResendVerfication}
                  isLoading={isResending}
+                 className='mt-2'
                  >
                   {isResending ? 'Resending...' : 'Resend Verification Email'}
                 </Button>

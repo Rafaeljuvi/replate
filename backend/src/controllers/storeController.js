@@ -21,7 +21,7 @@ const getMerchantStore = async(req,res) => {
                 address,
                 city,
                 latitude,
-                longtitude,
+                longitude,  
                 phone,
                 operating_hours,
                 logo_url,
@@ -29,12 +29,12 @@ const getMerchantStore = async(req,res) => {
                 bank_account_number,
                 qris_image_url,
                 is_active,
-                appoval_status,
+                approval_status,  
                 admin_notes,
                 approved_at,
                 approved_by,
                 created_at,
-                updated_ad
+                updated_at  
                 FROM stores
                 WHERE merchant_id = $1`, [merchantId]
         );

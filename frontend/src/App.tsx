@@ -25,7 +25,6 @@ import StoreReviewsPage from './pages/StoreReviewsPage';
 // ========================================
 import MerchantDashboard from './pages/MerchantDashboard';
 import MerchantPendingApprovalPage from './pages/MerchantPendingApprovalPage';
-import MerchantRejectedPage from './pages/MerchantRejectedPage';
 
 // ========================================
 // ADMIN PAGES
@@ -138,16 +137,6 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['merchant']}>
                 <MerchantPendingApprovalPage />
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* Merchant Rejected */}
-          <Route 
-            path="/merchant/rejected" 
-            element={
-              <ProtectedRoute allowedRoles={['merchant']}>
-                <MerchantRejectedPage />
               </ProtectedRoute>
             } 
           />

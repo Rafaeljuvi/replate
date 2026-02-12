@@ -117,12 +117,15 @@ const rejectStore = async (req, res) => {
         const { adminNotes } = req.body;
         const adminId = req.user.userId;
 
+        // Validate admin notes
         if(!adminNotes || adminNotes.trim().length < 10 ) {
             return res.status(400).json({
                 success: false,
                 message: 'Please provide a detailed reason for rejection (minimum 10 characters)'
             });
         }
+        
+        // Get store and merchant info before deleting
         const storeResult = await pool.query(
             `SELECT s.*, u.name, u.email 
              FROM stores s
@@ -130,51 +133,51 @@ const rejectStore = async (req, res) => {
              WHERE s.store_id = $1`,
             [storeId]
         );
+        
         if (storeResult.rows.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'Store not found'
             });
         }
+        
         const store = storeResult.rows[0];
-        if (store.approval_status === 'rejected') {
-            return res.status(400).json({
-                success: false,
-                message: 'Store is already rejected'
-            });
-        }
-        const updateResult = await pool.query(
-            `UPDATE stores 
-             SET approval_status = 'rejected',
-                 is_active = false,
-                 admin_notes = $1,
-                 approved_at = CURRENT_TIMESTAMP,
-                 approved_by = $2,
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE store_id = $3
-             RETURNING *`,
-            [adminNotes.trim(), adminId, storeId]
-        );
-
-        const updatedStore = updateResult.rows[0];
-
+        
+        // Send rejection email BEFORE deleting
         const emailSent = await sendMerchantRejectionEmail(
             store.email,
             store.name,
             store.store_name,
             adminNotes.trim()
         );
+        
+        // Delete store from database
+        await pool.query(
+            'DELETE FROM stores WHERE store_id = $1',
+            [storeId]
+        );
 
+        await pool.query(
+            'DELETE FROM users WHERE user_id = $1',
+            [store.merchant_id]
+        );
+
+        // Success response
         res.status(200).json({
             success: true,
-            message: 'Store rejected successfully',
+            message: 'Store rejected and deleted. Merchant can re-register.',
             data: {
-                store: updatedStore,
+                deletedStoreId: storeId,
+                storeName: store.store_name,
+                merchantEmail: store.email,
+                rejectionReason: adminNotes.trim(),
                 emailSent
             }
         });
 
-        console.log(`❌ Store rejected: ${store.store_name} by admin ${adminId}`);
+        console.log(`❌ Store rejected & deleted: ${store.store_name} by admin ${adminId}`);
+        console.log(`📧 Rejection email sent to: ${store.email}`);
+        
     } catch (error) {
         console.error('Reject store error:', error);
         res.status(500).json({

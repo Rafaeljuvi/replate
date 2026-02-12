@@ -20,6 +20,7 @@ app.use(cors({
 //MiddleWare
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use('/uploads', express.static('uploads'));
 
 //serve static files from uploads folder
 const uploadPath = path.join(__dirname, '../uploads')

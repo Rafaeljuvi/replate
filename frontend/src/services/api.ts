@@ -5,7 +5,6 @@ import type {
     LoginCredentials,
     RegisterCustomerData,
     RegisterMerchantStep1Data,
-    RegisterMerchantStep2Data,
     RegisterMerchantStep3Data,
     ForgotPasswordData,
     ResetPasswordData,
@@ -149,6 +148,33 @@ export const getMerchantStore = async(): Promise<Store> =>{
 export const googleAuth = async(credential: string, mode: 'signin' | 'register') : Promise<GoogleAuthResponse> =>{
     const {data} = await api.post<ApiResponse<GoogleAuthResponse>>('/Auth/google', {credential, mode});
     return data.data!;
+}
+
+// Admin Apis
+export const getAdminStats = async () => {
+    const {data} = await api.get('/admin/stats')
+    return data.data;
+}
+
+export const getPendingStores = async () => {
+    const { data }= await api.get('/admin/stores/pending')
+    return data.data
+}
+
+export const getAllStores = async (status?: 'pending' | 'approved' | 'rejected') => {
+    const params = status ? `?status=${status}` : '';
+    const { data } = await api.get(`/admin/stores${params}`);
+    return data.data;
+}
+
+export const approveStore = async (storeId: string) => {
+    const { data } = await api.patch(`/admin/stores/${storeId}/approve`);
+    return data.data;
+};
+
+export const rejectStore = async (storeId: string, adminNotes: string) => {
+    const {data} = await api.patch(`/admin/stores/${storeId}/reject`, {adminNotes})
+    return data.data
 }
 
 
