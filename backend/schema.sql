@@ -85,3 +85,12 @@ ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
 --     'admin', 
 --     true
 -- );
+
+
+-- tambahin ini
+
+-- ALTER TABLE stores 
+-- ADD COLUMN average_rating DECIMAL(2,1) DEFAULT 0.0;
+
+-- ALTER TABLE stores 
+-- ADD COLUMN total_ratings INTEGER DEFAULT 0;

@@ -94,6 +94,8 @@ export interface Store{
     approved_by?: string;
     created_at: string;
     updated_at?: string;
+    average_rating?: number;    
+    total_ratings?: number; 
 }
 
 //Map types
