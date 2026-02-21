@@ -94,3 +94,86 @@ ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
 
 -- ALTER TABLE stores 
 -- ADD COLUMN total_ratings INTEGER DEFAULT 0;
+
+
+-- tambahin ini buat table baru
+
+-- =============================================
+-- PRODUCTS TABLE SCHEMA
+-- =============================================
+
+-- Create products table
+-- CREATE TABLE IF NOT EXISTS products (
+--     -- Primary Key
+--     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    
+--     -- Foreign Key to stores
+--     store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
+    
+--     -- Product Information
+--     name VARCHAR(255) NOT NULL,
+--     description TEXT,
+--     category VARCHAR(100),
+    
+--     -- Pricing
+--     original_price DECIMAL(10, 2) NOT NULL CHECK (original_price >= 0),
+--     discounted_price DECIMAL(10, 2) NOT NULL CHECK (discounted_price >= 0),
+--     discount_percentage INTEGER DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    
+--     -- Inventory
+--     stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    
+--     -- Media
+--     image_url VARCHAR(500),
+    
+--     -- Availability
+--     is_active BOOLEAN DEFAULT true,
+--     available_from TIME,
+--     available_until TIME,
+    
+--     -- Timestamps
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- =============================================
+-- -- INDEXES (for faster queries)
+-- -- =============================================
+
+-- -- Index on store_id (frequently used in WHERE clause)
+-- CREATE INDEX IF NOT EXISTS idx_products_store_id ON products(store_id);
+
+-- -- Index on is_active (for filtering active/inactive products)
+-- CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
+
+-- -- Composite index for common query: active products by store
+-- CREATE INDEX IF NOT EXISTS idx_products_store_active ON products(store_id, is_active);
+
+-- -- =============================================
+-- -- TRIGGER (auto-update updated_at)
+-- -- =============================================
+
+-- -- Function to update updated_at timestamp
+-- CREATE OR REPLACE FUNCTION update_products_updated_at()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     NEW.updated_at = CURRENT_TIMESTAMP;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- -- Trigger that calls the function before UPDATE
+-- CREATE TRIGGER trigger_update_products_updated_at
+--     BEFORE UPDATE ON products
+--     FOR EACH ROW
+--     EXECUTE FUNCTION update_products_updated_at();
+
+-- =============================================
+-- VERIFICATION QUERIES
+-- =============================================
+
+-- Check table structure
+-- \d products
+
+-- Check if table exists
+-- SELECT table_name FROM information_schema.tables WHERE table_name = 'products';
