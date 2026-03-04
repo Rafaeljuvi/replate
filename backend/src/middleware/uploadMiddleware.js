@@ -2,47 +2,93 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-//Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, {recursive: true});
+//Product image uploads
+const productDir = path.join(__dirname, '../../uploads/products');
+if (!fs.existsSync(productDir)) {
+    fs.mkdirSync(productDir, {recursive: true});
+}
+
+//ID card image uploads
+const idCardDir = path.join(__dirname, '../../uploads/merchant/id-cards');
+if (!fs.existsSync(idCardDir)) {
+    fs.mkdirSync(idCardDir, {recursive: true});
+}
+
+//QRIS image uploads
+const QRISDir = path.join(__dirname, '../../uploads/merchant/qris');
+if (!fs.existsSync(QRISDir)) {
+    fs.mkdirSync(QRISDir, {recursive: true});
 }
 
 
-//Configure storage
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        //store files in uploads folder
-        cb(null, uploadDir)
+//Product Image Upload configure storage
+const productStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, productDir);
     },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const filename = file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname);
-        cb(null, filename);
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() *1E9)
+        const ext = path.extname(file.originalname)
+        cb(null, `product-${uniqueSuffix}${ext}`);
     }
 });
 
-
-// File filter (only images)
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/;
+const productImageFilter = (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
+    if (extname && mimetype) {
         return cb(null, true);
-    } else{
-        cb(new Error('Only image files are allowed!'));
+    } else {
+        cb(new Error('Only images are allowed (jpeg, jpg, png)'));
     }
-};
+}
 
-//Multer config
-const upload = multer ({
-    storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024,
+const uploadProductImage = multer({
+    storage: productStorage,
+    filter: productImageFilter,
+    limits: {fileSize: 5 * 1024 * 1024} // 5MB
+})
+
+//Merchant Image Uplods (ID Card, QRIS)
+const merchantStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        if(file.fieldname === 'idCardImage') {
+            cb(null, idCardDir);
+        } else if (file.fieldname === 'qrisImage') {
+            cb(null, QRISDir)
+        } else {
+            cb(new Error('Unknown field name'))
+        }
     },
-    fileFilter: fileFilter
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        const prefix = file.fieldname === 'idCardImage' ? 'idcard' : 'qris';
+        cb(null, `${prefix}-${uniqueSuffix}${ext}`);
+    }
 });
 
-module.exports = upload
+const merchantImageFilter = (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+        return cb(null, true);
+    } else {
+        cb(new Error('Only images are allowed (jpeg, jpg, png)'));
+    }
+}
+
+const uploadMerchantImages = multer({
+    storage: merchantStorage,
+    filter: merchantImageFilter,
+    limits: {fileSize: 5 * 1024 * 1024} // 5MB
+})
+
+
+
+module.exports = {
+    uploadProductImage,
+    uploadMerchantImages
+}

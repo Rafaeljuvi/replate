@@ -86,18 +86,7 @@ ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
 --     true
 -- );
 
-
--- tambahin ini
-
--- ALTER TABLE stores 
--- ADD COLUMN average_rating DECIMAL(2,1) DEFAULT 0.0;
-
--- ALTER TABLE stores 
--- ADD COLUMN total_ratings INTEGER DEFAULT 0;
-
-
--- tambahin ini buat table baru
-
+-- tambahin ini buat table baru products
 -- =============================================
 -- PRODUCTS TABLE SCHEMA
 -- =============================================

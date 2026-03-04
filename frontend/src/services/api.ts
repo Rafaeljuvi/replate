@@ -11,7 +11,10 @@ import type {
     User,
     Store,
     GoogleAuthResponse,
-    MerchantStats
+    MerchantStats,
+    Product,
+    CreateProductData, 
+    UpdateProductData
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -181,6 +184,95 @@ export const approveStore = async (storeId: string) => {
 export const rejectStore = async (storeId: string, adminNotes: string) => {
     const {data} = await api.patch(`/admin/stores/${storeId}/reject`, {adminNotes})
     return data.data
+}
+
+// Product APIs
+// File: frontend/src/services/api.ts
+
+export const createProduct = async (
+    productData: CreateProductData, 
+    imageFile?: File
+): Promise<Product> => {
+    const formData = new FormData();
+    
+    formData.append('name', productData.name);
+    formData.append('original_price', productData.original_price.toString());
+    formData.append('discount_percentage', productData.discount_percentage.toString());
+    formData.append('stock', productData.stock.toString());
+    
+    if (productData.description) formData.append('description', productData.description);
+    if (productData.category) formData.append('category', productData.category);
+    if (productData.available_from) formData.append('available_from', productData.available_from);
+    if (productData.available_until) formData.append('available_until', productData.available_until);
+    if (imageFile) formData.append('image', imageFile);
+    
+    const { data } = await api.post<ApiResponse<Product>>(
+        '/merchant/products', 
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    );
+    
+    return data.data!;
+};
+
+export const getProducts = async (): Promise<Product[]> => {
+    const { data } = await api.get<ApiResponse<Product[]>>('/merchant/products');
+    return data.data!;
+}
+
+export const getProductbyId = async (productId: string): Promise<Product> => {
+    const { data } = await api.get<ApiResponse<Product>>(`/merchant/products/${productId}`);
+    return data.data!;
+}
+
+export const updateProduct = async (
+    productId: string,
+    productData: UpdateProductData,
+    imageFile?: File
+): Promise<Product> => {
+    const formData = new FormData();
+    
+    // Append only provided fields
+    if (productData.name) formData.append('name', productData.name);
+    if (productData.original_price !== undefined) {
+        formData.append('original_price', productData.original_price.toString());
+    }
+    if (productData.discount_percentage !== undefined) {
+        formData.append('discount_percentage', productData.discount_percentage.toString());
+    }
+    if (productData.stock !== undefined) {
+        formData.append('stock', productData.stock.toString());
+    }
+    if (productData.description !== undefined) formData.append('description', productData.description);
+    if (productData.category !== undefined) formData.append('category', productData.category);
+    if (productData.available_from !== undefined) formData.append('available_from', productData.available_from);
+    if (productData.available_until !== undefined) formData.append('available_until', productData.available_until);
+    if (imageFile) formData.append('image', imageFile);
+    
+    const { data } = await api.patch<ApiResponse<Product>>(
+        `/merchant/products/${productId}`,
+        formData,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+    );
+    
+    return data.data!;
+};
+
+export const deleteProduct = async (productId: string) : Promise<void> => {
+    await api.delete(`/merchant/products/${productId}`);
+}
+
+export const toggleProductActive = async (productId: string) : Promise<Product> => {
+    const { data } = await api.patch<ApiResponse<Product>>( `/merchant/products/${productId}/toggle`);
+    return data.data!;
 }
 
 

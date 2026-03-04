@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Clock, Mail, CheckCircle, AlertCircle, LogOut } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle, LogOut } from "lucide-react";
 import Logo from "../components/layout/Logo";
 import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";

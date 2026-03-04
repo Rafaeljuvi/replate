@@ -125,3 +125,48 @@ export interface MerchantStats {
     total_ratings: number;
 }
 
+// =============================================
+// PRODUCT TYPES
+// =============================================
+
+export interface Product {
+    product_id: string;
+    store_id: string;
+    name: string;
+    description?: string;
+    category?: string;
+    original_price: number;
+    discounted_price: number;
+    discount_percentage: number;
+    stock: number;
+    image_url?: string;
+    is_active: boolean;
+    available_from?: string;
+    available_until?: string;
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface CreateProductData {
+    name: string;
+    description?: string;
+    category?: string;
+    original_price: number;
+    discount_percentage: number;
+    stock: number;
+    image_url?: string;
+    available_from?: string;
+    available_until?: string;
+}
+
+export interface UpdateProductData {
+    name?: string;
+    description?: string;
+    category?: string;
+    original_price?: number;
+    discount_percentage?: number;
+    stock?: number;
+    image_url?: string;
+    available_from?: string;
+    available_until?: string;
+  }

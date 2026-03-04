@@ -21,6 +21,7 @@ import StoreReviewsPage from './pages/StoreReviewsPage';
 // MERCHANT PAGES
 import MerchantDashboard from './pages/MerchantDashboard';
 import MerchantPendingApprovalPage from './pages/MerchantPendingApprovalPage';
+import ManageProductsPage from './pages/ManageProductsPage';
 
 
 // ADMIN PAGES
@@ -30,7 +31,6 @@ import AdminDashboard from './pages/AdminDashboard';
 // PROTECTED ROUTE COMPONENT
 
 import ProtectedRoute from './components/ProtectedRoute';
-
 import ComponentTestPage from './pages/ComponentTestPage';
 
 function App() {
@@ -134,6 +134,15 @@ function App() {
                 <MerchantPendingApprovalPage />
               </ProtectedRoute>
             } 
+          />
+
+          <Route
+            path='/merchant/products'
+            element={
+              <ProtectedRoute allowedRoles={['merchant']}>
+                <ManageProductsPage />
+              </ProtectedRoute>
+            }
           />
 
           {/* ========================================

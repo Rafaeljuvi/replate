@@ -7,7 +7,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const productRoutes = require('./routes/productRoutes');
 const path = require('path');
 const app = express()
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 
 // cors copnfiguration
@@ -25,7 +25,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/uploads', express.static('uploads'));
 
 //serve static files from uploads folder
-const uploadPath = path.join(__dirname, '../uploads')
+// const uploadPath = path.join(__dirname, '../uploads')
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 //Routes

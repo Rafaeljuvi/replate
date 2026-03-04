@@ -27,8 +27,8 @@ export default function Logo({ size = 'medium', className = '' }: LogoProps) {
   };
 
   return (
-    <Link to="/" className={`inline-block ${className}`}>
-      <div className="flex items-center gap-3">
+    // <Link to="/" className={`inline-block ${className}`}>
+      <div className="flex justify-center items-center gap-3">
         {/* Logo SVG */}
         <svg 
           className={logoSizes[size]} 
@@ -53,6 +53,6 @@ export default function Logo({ size = 'medium', className = '' }: LogoProps) {
           </p>
         </div>
       </div>
-    </Link>
+    // </Link>
   );
 }

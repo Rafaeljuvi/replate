@@ -29,10 +29,6 @@ export default function MerchantDashboard() {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // =============================================
-  // FETCH FUNCTIONS
-  // =============================================
-
   const fetchStore = async () => {
     try {
       setIsLoadingStore(true);
@@ -72,10 +68,6 @@ export default function MerchantDashboard() {
     navigate('/login');
   };
 
-  // =============================================
-  // EFFECTS
-  // =============================================
-
   useEffect(() => {
     fetchStore();
     fetchStats();
@@ -113,12 +105,8 @@ export default function MerchantDashboard() {
     );
   }
 
-  // =============================================
-  // MAIN RENDER
-  // =============================================
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-primary">
       
       {/* ==================== HEADER ==================== */}
       <div className="bg-white shadow">
@@ -127,7 +115,7 @@ export default function MerchantDashboard() {
             
             {/* Left: Logo */}
             <div>
-              <Logo size="small" />
+              <Logo size="small"/>
             </div>
 
             {/* Center: Title */}
@@ -153,6 +141,7 @@ export default function MerchantDashboard() {
                 size="small"
                 leftIcon={<LogOut size={16} />}
                 onClick={handleLogout}
+                className='border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 disabled:bg-white hover:text-white disabled:text-red-500'
               >
                 Logout
               </Button>
@@ -197,7 +186,7 @@ export default function MerchantDashboard() {
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-gray-100 text-gray-800'
               }`}>
-                {store.is_active ? '✅ Active' : '⏸️ Inactive'}
+                {store.is_active ? ' Active' : ' Inactive'}
               </span>
             </div>
           </div>
@@ -205,7 +194,7 @@ export default function MerchantDashboard() {
 
         {/* Stats Section */}
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Statistics Overview</h3>
+          <p className="text-lg font-bold text-white mb-4">Statistics Overview</p>
           
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -289,8 +278,8 @@ export default function MerchantDashboard() {
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="primary" fullWidth disabled>
-              📦 Manage Products
+            <Button variant="primary" fullWidth onClick={() => navigate('/merchant/products')}>
+              Manage Products
             </Button>
             <Button variant="primary" fullWidth disabled>
               🛒 View Orders
@@ -307,21 +296,3 @@ export default function MerchantDashboard() {
     </div>
   );
 }
-// export default function MerchantDashboard() {
-//     return (
-//       // <div className="min-h-screen bg-gray-50">
-//       //   <div className="max-w-7xl mx-auto px-4 py-8">
-//       //     <h1 className="text-3xl font-bold text-gray-800 mb-2">Merchant Dashboard</h1>
-//       //     <p className="text-gray-600">Placeholder - Will be built in Phase 2.8.4</p>
-//       //     <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-//       //       <p className="text-sm text-yellow-800">
-//       //         ✅ Protected Route - Only accessible by merchants (role: 'merchant')
-//       //       </p>
-//       //       <p className="text-sm text-yellow-800 mt-1">
-//       //         ⚠️ Requires approval_status = 'approved'
-//       //       </p>
-//       //     </div>
-//       //   </div>
-//       // </div>
-//     );
-//   }

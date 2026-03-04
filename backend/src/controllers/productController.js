@@ -1,6 +1,5 @@
 const pool = require('../config/db');
 
-
 const createProduct = async (req, res) => {
     try {
         const merchantId = req.user.userId;
@@ -9,9 +8,8 @@ const createProduct = async (req, res) => {
             description,
             category,
             original_price,
-            discounted_price,
+            discount_percentage,
             stock,
-            image_url,
             available_from,
             available_until
         } = req.body;
@@ -25,25 +23,25 @@ const createProduct = async (req, res) => {
         }
 
         // Validate required fields
-        if (!name || !original_price || !discounted_price || stock === undefined) {
+        if (!name || !original_price || discount_percentage === undefined || stock === undefined) {
             return res.status(400).json({
                 success: false,
-                message: 'Name, original price, discounted price, and stock are required.'
+                message: 'Name, original price, discount percentage, and stock are required.'
             });
         }
 
         // Validate prices
-        if (original_price < 0 || discounted_price < 0) {
+        if (original_price < 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Prices cannot be negative.'
+                message: 'Original price cannot be negative.'
             });
         }
 
-        if (discounted_price > original_price) {
+        if (discount_percentage < 0 || discount_percentage > 100) {
             return res.status(400).json({
                 success: false,
-                message: 'Discounted price cannot be higher than original price.'
+                message: 'Discount percentage must be between 0 and 100.'
             });
         }
 
@@ -71,9 +69,13 @@ const createProduct = async (req, res) => {
         const storeId = storeResult.rows[0].store_id;
 
         // Calculate discount percentage
-        const discount_percentage = Math.round(
-            ((original_price - discounted_price) / original_price) * 100
-        );
+        const discounted_price = original_price - (original_price * (discount_percentage / 100))
+
+        //Handle image upload
+        let image_url = null;
+        if(req.file) {
+            image_url = `/uploads/products/${req.file.filename}`;
+        }
 
         // Insert product
         const result = await pool.query(
@@ -234,7 +236,7 @@ const updateProduct = async (req, res) => {
             description,
             category,
             original_price,
-            discounted_price,
+            discount_percentage,
             stock,
             image_url,
             available_from,
@@ -281,26 +283,24 @@ const updateProduct = async (req, res) => {
 
         // Validate prices if provided
         const finalOriginalPrice = original_price !== undefined ? original_price : currentProduct.original_price;
-        const finalDiscountedPrice = discounted_price !== undefined ? discounted_price : currentProduct.discounted_price;
+        const finalDiscountPercentage = discount_percentage !== undefined ? discount_percentage : currentProduct.discount_percentage;
 
-        if (finalOriginalPrice < 0 || finalDiscountedPrice < 0) {
+        if (finalOriginalPrice < 0) {
             return res.status(400).json({
                 success: false,
                 message: 'Prices cannot be negative.'
             });
         }
 
-        if (finalDiscountedPrice > finalOriginalPrice) {
+        if (finalDiscountPercentage < 0 || finalDiscountPercentage > 100) {
             return res.status(400).json({
                 success: false,
-                message: 'Discounted price cannot be higher than original price.'
+                message: 'Discount percentage must be between 0  and 100.'
             });
         }
 
-        // Calculate discount percentage
-        const discount_percentage = Math.round(
-            ((finalOriginalPrice - finalDiscountedPrice) / finalOriginalPrice) * 100
-        );
+        //Calculate discounted price
+        const discounted_price = finalOriginalPrice - (finalOriginalPrice * (finalDiscountPercentage / 100))
 
         // Build update query dynamically
         const fieldsToUpdate = [];
@@ -323,17 +323,21 @@ const updateProduct = async (req, res) => {
             fieldsToUpdate.push(`original_price = $${paramCount++}`);
             values.push(original_price);
         }
-        if (discounted_price !== undefined) {
-            fieldsToUpdate.push(`discounted_price = $${paramCount++}`);
-            values.push(discounted_price);
-        }
-        if (original_price !== undefined || discounted_price !== undefined) {
+        if (discount_percentage !== undefined) {
             fieldsToUpdate.push(`discount_percentage = $${paramCount++}`);
             values.push(discount_percentage);
+        }
+        if (original_price !== undefined || discount_percentage !== undefined) {
+            fieldsToUpdate.push(`discounted_price = $${paramCount++}`);
+            values.push(discounted_price);
         }
         if (stock !== undefined) {
             fieldsToUpdate.push(`stock = $${paramCount++}`);
             values.push(stock);
+        }
+        if (req.file) {
+            fieldsToUpdate.push(`image_url = $${paramCount++}`);
+            values.push(`/uploads/products/${req.file.filename}`);
         }
         if (image_url !== undefined) {
             fieldsToUpdate.push(`image_url = $${paramCount++}`);

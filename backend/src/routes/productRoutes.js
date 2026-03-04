@@ -12,10 +12,10 @@ const {
     deleteProduct,
     toggleProductActive
 } = require('../controllers/productController');
-
+const {uploadProductImage} = require('../middleware/uploadMiddleware');
 
 // Create product
-router.post('/merchant/products', verifyToken, createProduct);
+router.post('/merchant/products', verifyToken, uploadProductImage.single('image'), createProduct);
 
 // Get all products (for current merchant)
 router.get('/merchant/products', verifyToken, getProducts);
@@ -24,7 +24,7 @@ router.get('/merchant/products', verifyToken, getProducts);
 router.get('/merchant/products/:id', verifyToken, getProductById);
 
 // Update product
-router.patch('/merchant/products/:id', verifyToken, updateProduct);
+router.patch('/merchant/products/:id', verifyToken, uploadProductImage.single('image'), updateProduct);
 
 // Delete product
 router.delete('/merchant/products/:id', verifyToken, deleteProduct);

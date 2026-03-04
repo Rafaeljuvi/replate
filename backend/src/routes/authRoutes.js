@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/uploadMiddleware')
+const {uploadMerchantImages} = require('../middleware/uploadMiddleware')
 
 const{
     registerUser,
@@ -22,7 +22,10 @@ router.post('/register/user', registerUser);
 router.post('/register/store/merchant', RegisterMerchant);
 router.post('/register/store/info', verifyToken, registerStoreInfo);
 router.post('/register/store/verification', verifyToken,
-    upload.any(),
+   uploadMerchantImages.fields([
+        {name: 'qrisImage', maxCount: 1},
+        {name: 'idCardImage', maxCount: 1}
+    ]),
     registerStoreVerification
 );
 router.post('/verify-email', verifyEmail);
