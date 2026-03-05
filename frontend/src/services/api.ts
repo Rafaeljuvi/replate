@@ -14,7 +14,8 @@ import type {
     MerchantStats,
     Product,
     CreateProductData, 
-    UpdateProductData
+    UpdateProductData,
+    UpdateStoreData
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -144,6 +145,7 @@ const { data } = await api.get<ApiResponse<{ user: User }>>('/auth/profile');
 return data.data!.user;
 };
 
+//Store Apis
 export const getMerchantStore = async(): Promise<Store> =>{
     const {data} = await api.get('/merchant/store');
     return data.data;
@@ -152,6 +154,30 @@ export const getMerchantStore = async(): Promise<Store> =>{
 export const getMerchantStoreStats = async (): Promise<MerchantStats> => {
     const {data} = await api.get<ApiResponse<MerchantStats>>('/merchant/store/stats')
     return data.data!
+}
+
+//Update store Data
+export const updateStore = async(
+    storeData: UpdateStoreData,
+    logoFile?: File
+) : Promise<Store> => {
+    const formData = new FormData();
+
+    if(storeData.store_name !== undefined) formData.append('store_name', storeData.store_name);
+    if(storeData.description !== undefined) formData.append('description', storeData.description);
+    if(storeData.address !== undefined) formData.append('address', storeData.address)
+    if(storeData.city !== undefined) formData.append('city', storeData.city)
+    if (storeData.phone !== undefined) formData.append('phone', storeData.phone);
+    if (storeData.operating_hours !== undefined) formData.append('operating_hours', storeData.operating_hours);
+    if (storeData.bank_account_number !== undefined) formData.append('bank_account_number', storeData.bank_account_number);
+    if (logoFile) formData.append('logo', logoFile);
+
+    const { data } = await api.patch<ApiResponse<Store>>(
+        '/merchant/store',
+        formData,
+        {headers: {'Content-Type': 'multipart/form-data'}}
+    )
+    return data.data!;
 }
 
 export const googleAuth = async(credential: string, mode: 'signin' | 'register') : Promise<GoogleAuthResponse> =>{
@@ -274,6 +300,7 @@ export const toggleProductActive = async (productId: string) : Promise<Product> 
     const { data } = await api.patch<ApiResponse<Product>>( `/merchant/products/${productId}/toggle`);
     return data.data!;
 }
+
 
 
 

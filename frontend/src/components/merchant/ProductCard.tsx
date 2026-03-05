@@ -32,12 +32,14 @@ export default function ProductCard({
     const getImageUrl = (imageUrl?: string) => {
         if (!imageUrl) return null;
     
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
+
         // Build full URL
         let fullUrl: string;
         if (imageUrl.startsWith('http')) {
             fullUrl = imageUrl;
         } else {
-            fullUrl = `http://localhost:5000${imageUrl}`;
+            fullUrl = `${API_BASE_URL}${imageUrl}`;
         }
     
         // Debug logs AFTER processing

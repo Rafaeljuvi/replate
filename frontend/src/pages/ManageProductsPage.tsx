@@ -210,7 +210,7 @@ export default function ManageProductsPage() {
             <div className="max-w-7xl mx-auto px-4 py-8 lg:px-6">
                 <div className="flex flex-col lg:flex-row gap-4">
 
-                    <div className="w-full lg:w-64 flex-shrink-0 space-y-6">
+                    <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
                         <div className="bg-white rounded-lg shadow-lg">
                             <div className="p-6 border-b border-gray-100">
                                 <h2 className="text-lg font-semibold text-gray-800">
@@ -264,7 +264,7 @@ export default function ManageProductsPage() {
                             </div>
                             
                             {/* Quick Actions */}
-                            <div className="bg-white rounded-g shadow">
+                            <div className="bg-white rounded-lg shadow">
                                 <div className="p-6 border-b border-gray-100">
                                     <h2 className="text-lg font-semibold text-gray-800">
                                         Quick Actions
@@ -312,8 +312,8 @@ export default function ManageProductsPage() {
                                         size="medium"
                                         fullWidth
                                         leftIcon={<Settings size={18} />}
-                                        disabled
                                         className="justify-start hover:bg-gray-50"
+                                        onClick={() => navigate('/merchant/settings')}
                                         >
                                         Store Settings
                                     </Button>

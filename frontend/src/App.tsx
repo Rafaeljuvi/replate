@@ -22,6 +22,7 @@ import StoreReviewsPage from './pages/StoreReviewsPage';
 import MerchantDashboard from './pages/MerchantDashboard';
 import MerchantPendingApprovalPage from './pages/MerchantPendingApprovalPage';
 import ManageProductsPage from './pages/ManageProductsPage';
+import StoreSettingsPage from './pages/StoreSettings';
 
 
 // ADMIN PAGES
@@ -141,6 +142,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['merchant']}>
                 <ManageProductsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/merchant/settings'
+            element={
+              <ProtectedRoute allowedRoles={['merchant']}>
+                <StoreSettingsPage/>
               </ProtectedRoute>
             }
           />

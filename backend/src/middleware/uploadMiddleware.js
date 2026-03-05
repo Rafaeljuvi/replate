@@ -20,6 +20,11 @@ if (!fs.existsSync(QRISDir)) {
     fs.mkdirSync(QRISDir, {recursive: true});
 }
 
+//Logo || profile picture
+const logoDir = path.join(__dirname, '../../uploads/merchant/logos')
+if(!fs.existsSync(logoDir)){
+    fs.mkdirSync(logoDir, {recursive: true});
+}
 
 //Product Image Upload configure storage
 const productStorage = multer.diskStorage({
@@ -50,21 +55,26 @@ const uploadProductImage = multer({
     limits: {fileSize: 5 * 1024 * 1024} // 5MB
 })
 
-//Merchant Image Uplods (ID Card, QRIS)
+//Merchant Image Uplods (ID Card, QRIS, logo)
 const merchantStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         if(file.fieldname === 'idCardImage') {
             cb(null, idCardDir);
         } else if (file.fieldname === 'qrisImage') {
             cb(null, QRISDir)
-        } else {
+        } else if(file.fieldname === 'logo')
+            cb(null, logoDir)
+        else {
             cb(new Error('Unknown field name'))
         }
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const ext = path.extname(file.originalname);
-        const prefix = file.fieldname === 'idCardImage' ? 'idcard' : 'qris';
+        const prefix = file.fieldname === 'idCardImage' ? 'idcard' 
+                    :  file.fieldname === 'qrisImage' ? 'qris'
+                    : 'logo';
+
         cb(null, `${prefix}-${uniqueSuffix}${ext}`);
     }
 });
@@ -85,7 +95,6 @@ const uploadMerchantImages = multer({
     filter: merchantImageFilter,
     limits: {fileSize: 5 * 1024 * 1024} // 5MB
 })
-
 
 
 module.exports = {

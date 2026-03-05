@@ -170,3 +170,18 @@ export interface UpdateProductData {
     available_from?: string;
     available_until?: string;
   }
+
+// =============================================
+// Data store
+// =============================================  
+
+export interface UpdateStoreData {
+    store_name?: string;
+    description?: string;
+    address?: string;
+    city?: string;
+    phone?: string;
+    operating_hours?: string;
+    bank_account_number?: string;
+}
+

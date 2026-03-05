@@ -21,6 +21,7 @@ export default function Button({
   fullWidth = false,
   disabled,
   className = '',
+  type='button',
   ...props
 }: ButtonProps) {
   // Base classes
@@ -49,6 +50,7 @@ export default function Button({
 
   return (
     <button
+    type={type}
       className={`
         ${baseClasses}
         ${variantClasses[variant]}

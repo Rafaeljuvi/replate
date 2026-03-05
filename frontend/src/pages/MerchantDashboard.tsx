@@ -9,25 +9,28 @@ import {
   Clock,
   DollarSign,
   Star,
+  Store,
   Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { getMerchantStore, getMerchantStoreStats } from '../services/api';
-import type { Store, MerchantStats } from '../@types';
+import type { Store as storeInfo, MerchantStats } from '../@types';
 import Logo from '../components/layout/Logo';
 import Button from '../components/ui/Button';
 import StatsCard from '../components/merchant/StatsCard';
+
 
 export default function MerchantDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [store, setStore] = useState<Store | null>(null);
+  const [store, setStore] = useState<storeInfo | null>(null);
   const [stats, setStats] = useState<MerchantStats | null>(null);
   const [isLoadingStore, setIsLoadingStore] = useState(true);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000'
 
   const fetchStore = async () => {
     try {
@@ -157,29 +160,42 @@ export default function MerchantDashboard() {
         {store && (
           <div className="bg-white rounded-lg shadow p-6 mb-8">
             <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {store.store_name}
-                </h2>
-                <div className="flex items-center gap-2 mb-2">
-                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  <span className="text-lg font-semibold text-gray-900">
-                    {formatRating(store.average_rating || 0)}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    ({store.total_ratings || 0} reviews)
-                  </span>
+              <div className='flex items-start gap-4'>
+
+                <div className='w-16 h-16 rounded-full border=2 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0'>
+                  {store.logo_url 
+                    ? <img
+                        src={`${API_BASE_URL}${store.logo_url}`}
+                        alt='Store logo'
+                        className='w-full h-full object-cover'
+                        />
+                      : <Store size={28} className='text-gray-400'/>}
                 </div>
-                <p className="text-sm text-gray-600 mb-1">
-                  📍 {store.address}, {store.city}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  📞 {store.phone}
-                </p>
-                <p className="text-sm text-gray-600">
-                  🕒 {store.operating_hours}
-                </p>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {store.store_name}
+                  </h2>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                    <span className="text-lg font-semibold text-gray-900">
+                      {formatRating(store.average_rating || 0)}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      ({store.total_ratings || 0} reviews)
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-1">
+                    📍 {store.address}, {store.city}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    📞 {store.phone}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    🕒 {store.operating_hours}
+                  </p>
+                </div>
               </div>
+             
 
               <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
                 store.is_active 
@@ -284,8 +300,8 @@ export default function MerchantDashboard() {
             <Button variant="primary" fullWidth disabled>
               🛒 View Orders
             </Button>
-            <Button variant="primary" fullWidth disabled>
-              ⚙️ Store Settings
+            <Button variant="primary" fullWidth onClick={() => navigate('/merchant/settings')}>
+              Store Settings
             </Button>
           </div>
           <p className="text-sm text-gray-500 mt-4 text-center">
