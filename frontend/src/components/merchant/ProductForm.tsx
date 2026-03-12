@@ -38,7 +38,14 @@ export default function ProductForm({ product, onSubmit, onCancel, isLoading}: P
     const original_price = watch('original_price')
     const discount_percentage = watch('discount_percentage')
 
-    const discounted_price  = original_price && discount_percentage !== undefined ? original_price - (original_price * (discount_percentage / 100)) : 0;
+    const discounted_price  = (() => {
+        const price = Number(original_price) || 0;;
+        const discount = Number(discount_percentage) || 0;
+        if (price <= 0) return 0;
+        if (discount < 0) return price;
+        if (discount > 100) return 0;
+        return price - (price * (discount / 100));
+    }) ();
 
     useEffect(() => {
         if (product?.image_url) {

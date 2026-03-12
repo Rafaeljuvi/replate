@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const storeRoutes = require('./routes/storeRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const productRoutes = require('./routes/productRoutes');
+const publicRoutes = require('./routes/publicRoutes');
 const path = require('path');
 const app = express()
 const PORT = process.env.PORT || 5000;
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', storeRoutes);
 app.use('/api/admin', adminRoutes); 
 app.use('/api', productRoutes);
+app.use('/api/public', publicRoutes);
 
 //API check
 app.get('/', (req, res) => {

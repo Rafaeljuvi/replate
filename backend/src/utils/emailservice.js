@@ -3,10 +3,13 @@ const nodemailer = require('nodemailer');
 //configure email transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth:{
-        user:process.env.EMAIL_USER,
+    auth: {
+        user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
+    tls: {
+        rejectUnauthorized: false 
+    }
 });
 
 //Send verification email 
@@ -19,7 +22,7 @@ const sendVerificationEmail = async (email, name, verificationToken, userType = 
     : 'Welcome to Replate!';
 
     const mailOptions = {
-        from: `"Replate - Bakery Marketplace" <${process.env.EMAIL_USER}`,
+        from: `"Replate - Bakery Marketplace" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: 'Verify Your Email - Replate',
         html: `
@@ -44,7 +47,7 @@ const sendVerificationEmail = async (email, name, verificationToken, userType = 
                         Verify Email Address
                     </a>
                 </div>
-                <p style= "color: #666; line-height: 1.6; font-size: 14px;>
+                <p style= "color: #666; line-height: 1.6; font-size: 14px;">
                     Or copy and paste this link in your browser:
                 </p>
                 <div style = "margin-top: 40px; padding-top: 20px; border-top 1px solid #ddd;">

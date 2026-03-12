@@ -185,3 +185,50 @@ export interface UpdateStoreData {
     bank_account_number?: string;
 }
 
+//Public type (Customer)
+export interface PublicProduct {
+    product_id: string;
+    store_id: string;
+    name: string;
+    description?: string;
+    category?: string;
+    original_price: number;
+    discounted_price: number;
+    discount_percentage: number;
+    stock: number;
+    image_url?: string;
+    available_from?: string;
+    available_until?: string;
+    created_at: string;
+    store_name: string;
+    store_logo?: string;
+    average_rating?: number;
+    operating_hours?: string;
+    store_lat?: number;
+    store_lng?: number;
+    distance_km?: number;
+    total_ratings?: number;
+    address?: string;
+    city?: string;
+    store_phone?: string;
+    latitude?: number;
+    longitude?: number;
+    is_available_now?: boolean;
+}
+
+export interface PublicStore {
+    store_id: string;
+    store_name: string;
+    description?: string;
+    logo_url?: string;
+    address: string;
+    city: string;
+    operating_hours?: string;
+    average_rating?: number;
+    total_ratings?: number;
+    latitude: number;
+    longitude: number;
+    active_products: number;
+    distance_km?: number
+    phone?: string
+}

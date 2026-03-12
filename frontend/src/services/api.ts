@@ -15,7 +15,9 @@ import type {
     Product,
     CreateProductData, 
     UpdateProductData,
-    UpdateStoreData
+    UpdateStoreData,
+    PublicProduct,
+    PublicStore
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -213,7 +215,6 @@ export const rejectStore = async (storeId: string, adminNotes: string) => {
 }
 
 // Product APIs
-// File: frontend/src/services/api.ts
 
 export const createProduct = async (
     productData: CreateProductData, 
@@ -301,7 +302,61 @@ export const toggleProductActive = async (productId: string) : Promise<Product> 
     return data.data!;
 }
 
+//Public Apis (customer)
+export const getPublicProducts = async (
+    lat?: number,
+    lng?: number,
+    radius: number = 2
+): Promise<PublicProduct[]> => {
+    const params = new URLSearchParams();
+    if(lat !== undefined && lng !== undefined){
+        params.append('lat', lat.toString());
+        params.append('lng', lng.toString());
+        params.append('radius', radius.toString());
+    }
 
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const { data } = await api.get<ApiResponse<PublicProduct[]>>(`/public/products${query}`);
+    return data.data!;
+}
+
+export const getPublicProductById = async (productId: string, lat?: number, lng?: number) : Promise<PublicProduct> => {
+    const params = new URLSearchParams();
+    if(lat !== undefined && lng !== undefined) {
+        params.append('lat', lat.toString());
+        params.append('lng', lng.toString());
+    }
+    const query = params.toString()? `?${params.toString()}` : '';
+    const { data } = await api.get<ApiResponse<PublicProduct>>(`/public/products/${productId}${query}`);
+    return data.data!
+}
+
+export const getPublicStores = async (lat?: number, lng?: number):
+Promise<PublicStore[]> => {
+    const params = new URLSearchParams();
+    if(lat !== undefined && lng !== undefined){
+        params.append('lat', lat.toString());
+        params.append('lng', lng.toString());
+    }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const { data } = await api.get<ApiResponse<PublicStore[]>>(`/public/stores${query}`);
+    return data.data!;
+}
+
+export const getPublicStoreById = async (
+    storeId: string,
+    lat?: number,
+    lng?: number
+): Promise<{store: PublicStore; products: PublicProduct[]}> => {
+    const params = new URLSearchParams();
+    if (lat !== undefined && lng !== undefined) {
+        params.append('lat', lat.toString());
+        params.append('lng', lng.toString());
+    }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const { data } = await api.get<ApiResponse<{store: PublicStore; products: PublicProduct[]}>>(`/public/stores/${storeId}${query}`)
+    return data.data!;
+}
 
 
 export default api;

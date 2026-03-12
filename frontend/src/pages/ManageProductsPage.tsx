@@ -211,112 +211,114 @@ export default function ManageProductsPage() {
                 <div className="flex flex-col lg:flex-row gap-4">
 
                     <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
-                        <div className="bg-white rounded-lg shadow-lg">
-                            <div className="p-6 border-b border-gray-100">
-                                <h2 className="text-lg font-semibold text-gray-800">
-                                    Statistics
-                                </h2>
-                            </div>
-
-                            <div className="p-6 space-y-4">
-                                {/* Total products */}
-                                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                                            <Package size={20} className="text-white"/>
-                                        </div>
-                                        <div className="text-3xl font-bold text-blue-900">
-                                            {totalProducts}
-                                        </div>
-                                    </div>
-                                    <p className="text-sm font-medium text-blue-700">Total Products</p>
-                                </div>
-
-                                {/* Active Products */}
-                                <div className="bg-primary rounded-lg p-4 text-white">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary text-xl font-bold">
-                                            ✓
-                                        </div>
-                                        <div className="text-3xl font-bold text-gray-100">
-                                            {activeProducts}
-                                        </div>
-                                    </div>
-                                    <p className="text-sm font-medium text-white">
-                                        Active Products
-                                    </p>
-                                </div>
-
-                                {/* Inactive Products */}
-                                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center text-white text-xl font-bold">
-                                            x
-                                        </div>
-                                        <div className="text-3xl font-bold text-gray-900">
-                                            {inactiveProducts}
-                                        </div>
-                                    </div>
-                                    <p className="text-sm font-medium text-gray-700">
-                                        Inactive products
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            {/* Quick Actions */}
-                            <div className="bg-white rounded-lg shadow">
+                        <div className="sticky top-2 space-y-6">
+                            <div className="bg-white rounded-lg shadow-lg">
                                 <div className="p-6 border-b border-gray-100">
                                     <h2 className="text-lg font-semibold text-gray-800">
-                                        Quick Actions
+                                        Statistics
                                     </h2>
                                 </div>
-                                <div className="p-6 space-y-3">
-                                    <Button
-                                        variant="primary"
-                                        size="medium"
-                                        fullWidth
-                                        leftIcon={<Plus size={18}/>}
-                                        onClick={openCreateModal}
-                                        className="justify-start"
-                                    >
-                                        Add New Product
-                                    </Button>
 
-                                    <Button
-                                        variant="outline"
-                                        size="medium"
-                                        fullWidth
-                                        leftIcon={<RefreshCcw size={18}/>}
-                                        onClick={handleRefresh}
-                                        disabled={isRefreshing}
-                                        className="justify-start"
-                                    >
-                                        {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                                    </Button>
+                                <div className="p-6 space-y-4">
+                                    {/* Total products */}
+                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                                                <Package size={20} className="text-white"/>
+                                            </div>
+                                            <div className="text-3xl font-bold text-blue-900">
+                                                {totalProducts}
+                                            </div>
+                                        </div>
+                                        <p className="text-sm font-medium text-blue-700">Total Products</p>
+                                    </div>
 
-                                    <div className="border-t border-gray-200 my-2"></div>
+                                    {/* Active Products */}
+                                    <div className="bg-primary rounded-lg p-4 text-white">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-primary text-xl font-bold">
+                                                ✓
+                                            </div>
+                                            <div className="text-3xl font-bold text-gray-100">
+                                                {activeProducts}
+                                            </div>
+                                        </div>
+                                        <p className="text-sm font-medium text-white">
+                                            Active Products
+                                        </p>
+                                    </div>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="medium"
-                                        fullWidth
-                                        leftIcon={<ShoppingBag size={18}/>}
-                                        disabled
-                                        className="justify-start hover:bg-gray-50"
-                                    >   
-                                        View Orders
-                                    </Button>
-
-                                    <Button
-                                        variant="ghost"
-                                        size="medium"
-                                        fullWidth
-                                        leftIcon={<Settings size={18} />}
-                                        className="justify-start hover:bg-gray-50"
-                                        onClick={() => navigate('/merchant/settings')}
+                                    {/* Inactive Products */}
+                                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="w-10 h-10 bg-gray-400 rounded-lg flex items-center justify-center text-white text-xl font-bold">
+                                                x
+                                            </div>
+                                            <div className="text-3xl font-bold text-gray-900">
+                                                {inactiveProducts}
+                                            </div>
+                                        </div>
+                                        <p className="text-sm font-medium text-gray-700">
+                                            Inactive products
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {/* Quick Actions */}
+                                <div className="bg-white rounded-lg shadow">
+                                    <div className="p-6 border-b border-gray-100">
+                                        <h2 className="text-lg font-semibold text-gray-800">
+                                            Quick Actions
+                                        </h2>
+                                    </div>
+                                    <div className="p-6 space-y-3">
+                                        <Button
+                                            variant="primary"
+                                            size="medium"
+                                            fullWidth
+                                            leftIcon={<Plus size={18}/>}
+                                            onClick={openCreateModal}
+                                            className="justify-start"
                                         >
-                                        Store Settings
-                                    </Button>
+                                            Add New Product
+                                        </Button>
+
+                                        <Button
+                                            variant="outline"
+                                            size="medium"
+                                            fullWidth
+                                            leftIcon={<RefreshCcw size={18}/>}
+                                            onClick={handleRefresh}
+                                            disabled={isRefreshing}
+                                            className="justify-start"
+                                        >
+                                            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                                        </Button>
+
+                                        <div className="border-t border-gray-200 my-2"></div>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="medium"
+                                            fullWidth
+                                            leftIcon={<ShoppingBag size={18}/>}
+                                            disabled
+                                            className="justify-start hover:bg-gray-50"
+                                        >   
+                                            View Orders
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="medium"
+                                            fullWidth
+                                            leftIcon={<Settings size={18} />}
+                                            className="justify-start hover:bg-gray-50"
+                                            onClick={() => navigate('/merchant/settings')}
+                                            >
+                                            Store Settings
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

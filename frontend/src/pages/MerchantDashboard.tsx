@@ -10,7 +10,8 @@ import {
   DollarSign,
   Star,
   Store,
-  Users
+  Users,
+  ClipboardCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
@@ -255,7 +256,7 @@ export default function MerchantDashboard() {
               <StatsCard
                 title="Completed Orders"
                 value={stats.completed_orders}
-                icon={<CheckCircle size={24} />}
+                icon={<ClipboardCheck size={24} />}
                 color="green"
                 subtitle="Successfully fulfilled"
               />

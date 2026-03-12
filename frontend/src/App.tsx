@@ -14,9 +14,12 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 
 
 // CUSTOMER PAGES
-import CustomerDashboard from './pages/CustomerDashboard';
+import CustomerHomePage from './pages/CustomerDashboard';
 import MyRatingsPage from './pages/MyRatingsPage';
 import StoreReviewsPage from './pages/StoreReviewsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import StoreDetailPage from './pages/StoreDetailPage';
+
 
 // MERCHANT PAGES
 import MerchantDashboard from './pages/MerchantDashboard';
@@ -32,7 +35,7 @@ import AdminDashboard from './pages/AdminDashboard';
 // PROTECTED ROUTE COMPONENT
 
 import ProtectedRoute from './components/ProtectedRoute';
-import ComponentTestPage from './pages/ComponentTestPage';
+
 
 function App() {
   return (
@@ -95,7 +98,7 @@ function App() {
             path="/dashboard" 
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <CustomerDashboard />
+                <CustomerHomePage/>
               </ProtectedRoute>
             } 
           />
@@ -112,6 +115,28 @@ function App() {
           
           {/* Store Reviews (Public - anyone can view) */}
           <Route path="/stores/:storeId/reviews" element={<StoreReviewsPage />} />
+
+          {/* product Detail */}
+          <Route
+            path='/products/:id'
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <ProductDetailPage/>
+              </ProtectedRoute>
+            }
+          >
+          </Route>
+
+          {/* Store detail Page */}
+          <Route
+            path='/stores/:id'
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <StoreDetailPage/>
+              </ProtectedRoute>
+            }
+          >
+          </Route>
 
           {/* ========================================
               MERCHANT ROUTES (Protected)
@@ -178,9 +203,7 @@ function App() {
           
           {/* 404 - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
-
-          {/* Component Test Page - for development only */}
-            <Route path="/test-components" element={<ComponentTestPage />} />
+          
         </Routes>
       </BrowserRouter>
     </AuthProvider>
