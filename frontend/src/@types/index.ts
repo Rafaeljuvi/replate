@@ -232,3 +232,62 @@ export interface PublicStore {
     distance_km?: number
     phone?: string
 }
+
+export interface CartItem {
+    cart_item_id: string;
+    cart_id: string;
+    quantity: number;
+    price_at_time: number;
+    subtotal: number;
+    product_id: string;
+    name: string;
+    description?: string;
+    image_url?: string;
+    stock: number;
+    discount_percentage: number;
+    original_price: number;
+    discounted_price: number;
+    is_active: boolean;
+    available_from?: string;
+    available_until?: string;
+    store_id: string;
+    store_name: string;
+    store_logo?: string;
+}
+
+export interface CartData {
+    items: CartItem[];
+    total_items: number;
+    total_price: number
+}
+
+export interface Order {
+    order_id: string;
+    status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled';
+    total_price: number;
+    notes?: string;
+    payment_method?: string;
+    payment_status: 'unpaid' | 'paid' | 'refunded';
+    created_at: string;
+    updated_at: string;
+    store_id?: string;
+    store_name?: string;
+    store_logo?: string;
+    address?: string;
+    store_phone?: string;
+    total_items?: number;
+    total_quantity?: number;
+    customer_name?: string;
+    customer_phone?: string;
+}
+
+export interface OrderItem {
+    order_item_id: string;
+    quantity: number;
+    price_at_time: number;
+    subtotal: number;
+    product_id: string;
+    name: string;
+    image_url?: string;
+    category?: string;
+}

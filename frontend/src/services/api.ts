@@ -17,7 +17,10 @@ import type {
     UpdateProductData,
     UpdateStoreData,
     PublicProduct,
-    PublicStore
+    PublicStore,
+    CartData,
+    Order,
+    OrderItem
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -356,6 +359,63 @@ export const getPublicStoreById = async (
     const query = params.toString() ? `?${params.toString()}` : '';
     const { data } = await api.get<ApiResponse<{store: PublicStore; products: PublicProduct[]}>>(`/public/stores/${storeId}${query}`)
     return data.data!;
+}
+
+//Cart APIs
+export const getCart = async(): Promise<CartData> =>{
+    const {data} = await api.get<ApiResponse<CartData>>('/cart')
+    return data.data!
+}
+
+export const addToCart = async(productId: string, quantity: number = 1): Promise<void> => {
+    await api.post('/cart/items', {product_id: productId, quantity});
+}
+
+export const updateCartItem = async (cartItemId: string, quantity:number): Promise<void> => {
+    await api.patch(`/cart/items/${cartItemId}`, {quantity})
+}
+
+export const removeCartItem = async(cartItemId: string): Promise<void> => {
+    await api.delete(`/cart/items/${cartItemId}`)
+}
+
+export const clearCart = async(): Promise<void> => {
+    await api.delete('/cart')
+}
+
+//Orders APIs
+export const createOrder = async (notes?: string, paymentMethod?: string): Promise<Order[]> => {
+    const { data } = await api.post<ApiResponse<{ orders: Order[] }>>('/orders', {
+        notes,
+        payment_method: paymentMethod
+    });
+    return data.data!.orders;
+};
+
+export const getMyOrders = async (status?: string): Promise<Order[]> => {
+    const query = status ? `?status=${status}` : '';
+    const {data} = await api.get<ApiResponse<Order[]>>(`/orders${query}`);
+    return data.data!
+}
+
+export const getOrderDetail = async(orderId: string): Promise<{order: Order; items: OrderItem[]}> => {
+    const {data} = await api.get<ApiResponse<{order: Order; items: OrderItem[]}>>(`/orders/${orderId}`)
+    return data.data!
+}
+
+export const cancelOrder = async (orderId: string): Promise<void> => {
+    await api.patch(`/orders/${orderId}/cancel`)
+}
+
+//Merchant side of order APIs
+export const getStoreOrders = async(status?: string):Promise<Order[]> => {
+    const query = status ? `status=${status}` : '';
+    const { data } = await api.get<ApiResponse<Order[]>>(`/orders/store/list${query}`)
+    return data.data!
+}
+
+export const updateOrderStatus = async (orderId: string, status: string): Promise<void> => {
+    await api.patch(`/orders/store/${orderId}/status`, { status });
 }
 
 

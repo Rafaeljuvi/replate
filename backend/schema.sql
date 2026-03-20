@@ -76,15 +76,15 @@ ADD COLUMN IF NOT EXISTS average_rating DECIMAL(2,1) DEFAULT (0.0);
 ALTER TABLE stores
 ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
 
--- INSERT INTO users (email, password, name, phone, role, is_verified) 
--- VALUES (
---     'admin@bakery.com', 
---     '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
---     'Admin', 
---     '081234567890', 
---     'admin', 
---     true
--- );
+INSERT INTO users (email, password, name, phone, role, is_verified) 
+VALUES (
+    'admin@bakery.com', 
+    '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 
+    'Admin', 
+    '081234567890', 
+    'admin', 
+    true
+);
 
 -- tambahin ini buat table baru products
 -- =============================================
@@ -92,77 +92,137 @@ ADD COLUMN IF NOT EXISTS total_ratings INTEGER DEFAULT 0;
 -- =============================================
 
 -- Create products table
--- CREATE TABLE IF NOT EXISTS products (
---     -- Primary Key
---     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS products (
+    -- Primary Key
+    product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     
---     -- Foreign Key to stores
---     store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
+    -- Foreign Key to stores
+    store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
     
---     -- Product Information
---     name VARCHAR(255) NOT NULL,
---     description TEXT,
---     category VARCHAR(100),
+    -- Product Information
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
     
---     -- Pricing
---     original_price DECIMAL(10, 2) NOT NULL CHECK (original_price >= 0),
---     discounted_price DECIMAL(10, 2) NOT NULL CHECK (discounted_price >= 0),
---     discount_percentage INTEGER DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    -- Pricing
+    original_price DECIMAL(10, 2) NOT NULL CHECK (original_price >= 0),
+    discounted_price DECIMAL(10, 2) NOT NULL CHECK (discounted_price >= 0),
+    discount_percentage INTEGER DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
     
---     -- Inventory
---     stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    -- Inventory
+    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
     
---     -- Media
---     image_url VARCHAR(500),
+    -- Media
+    image_url VARCHAR(500),
     
---     -- Availability
---     is_active BOOLEAN DEFAULT true,
---     available_from TIME,
---     available_until TIME,
+    -- Availability
+    is_active BOOLEAN DEFAULT true,
+    available_from TIME,
+    available_until TIME,
     
---     -- Timestamps
---     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
+    -- Timestamps
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- -- =============================================
 -- -- INDEXES (for faster queries)
 -- -- =============================================
 
--- -- Index on store_id (frequently used in WHERE clause)
--- CREATE INDEX IF NOT EXISTS idx_products_store_id ON products(store_id);
+-- Index on store_id (frequently used in WHERE clause)
+CREATE INDEX IF NOT EXISTS idx_products_store_id ON products(store_id);
 
--- -- Index on is_active (for filtering active/inactive products)
--- CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
+-- Index on is_active (for filtering active/inactive products)
+CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
 
--- -- Composite index for common query: active products by store
--- CREATE INDEX IF NOT EXISTS idx_products_store_active ON products(store_id, is_active);
+-- Composite index for common query: active products by store
+CREATE INDEX IF NOT EXISTS idx_products_store_active ON products(store_id, is_active);
 
 -- -- =============================================
 -- -- TRIGGER (auto-update updated_at)
 -- -- =============================================
 
--- -- Function to update updated_at timestamp
--- CREATE OR REPLACE FUNCTION update_products_updated_at()
--- RETURNS TRIGGER AS $$
--- BEGIN
---     NEW.updated_at = CURRENT_TIMESTAMP;
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_products_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- -- Trigger that calls the function before UPDATE
--- CREATE TRIGGER trigger_update_products_updated_at
---     BEFORE UPDATE ON products
---     FOR EACH ROW
---     EXECUTE FUNCTION update_products_updated_at();
+-- Trigger that calls the function before UPDATE
+CREATE TRIGGER trigger_update_products_updated_at
+    BEFORE UPDATE ON products
+    FOR EACH ROW
+    EXECUTE FUNCTION update_products_updated_at();
 
 -- =============================================
 -- VERIFICATION QUERIES
 -- =============================================
 
--- Check table structure
--- \d products
+Check table structure
+\d products
 
--- Check if table exists
--- SELECT table_name FROM information_schema.tables WHERE table_name = 'products';
+Check if table exists
+SELECT table_name FROM information_schema.tables WHERE table_name = 'products';
+
+
+-- =============================================
+-- Shopping Cart TABLE SCHEMA
+-- =============================================
+-- Shopping Cart table
+CREATE TABLE cart (
+    cart_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES user(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id)
+);
+
+-- Cart items
+CREATE TABLE cart_items (
+    cart_item_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cart_id UUID NOT NULL REFERENCES cart(cart_id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
+    store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    price_at_time DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(cart_id, product_id)
+);
+
+CREATE TABLE orders (
+    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES user(user_id) ON DELETE CASCADE,
+    store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'confirmed', 'ready', 'completed', 'cancelled')),
+    total_price DECIMAL(10,2) NOT NULL,
+    notes TEXT,
+    payment_method VARCHAR(50),
+    payment_status VARCHAR(20) DEFAULT 'unpaid'
+        CHECK(payment_status IN ('unpaid', 'paid', 'refunded')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Order items
+CREATE TABLE order_items (
+    order_item_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(product_id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL,
+    price_at_time DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CART INDEXES
+CREATE INDEX idx_cart_user ON cart(user_id);
+CREATE INDEX idx_cart_items_cart ON cart_items(cart_id);
+CREATE INDEX idx_orders_user ON orders(user_id);
+CREATE INDEX idx_orders_store ON orders(store_id);
+CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX idx_order_items_order ON order_items(order_id);

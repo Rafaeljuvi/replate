@@ -4,7 +4,7 @@ import {
     Clock,MapPin, Star, Phone, ShoppingCart, Store, Tag, Package
 } from 'lucide-react'
 import toast from "react-hot-toast";
-import { getPublicProductById } from "../services/api";
+import { getPublicProductById, addToCart } from "../services/api";
 import type { PublicProduct } from "../@types";
 import CustomerHeader from '../components/customer/CustomerHeader';
 
@@ -57,9 +57,15 @@ export default function ProductDetailPage() {
         return time.slice(0,5);
     }
 
-    const handleAddToCart = () => {
-        toast.success(`Added ${quantity}x ${product?.name} to cart!`)
-    }
+    const handleAddToCart = async () => {
+        if(!product) return;
+        try {
+            await addToCart(product.product_id, quantity);
+            toast.success(`${quantity}x ${product.name} added to cart!`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to add to cart');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -309,7 +315,7 @@ export default function ProductDetailPage() {
 
                             <button
                                 onClick={handleAddToCart}
-                                className="w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-gray-50 hover:text-primary transition-colors flex items-center justify-center gap-2"
                             >
                                 <ShoppingCart size={18}/>
                                 Add to Cart

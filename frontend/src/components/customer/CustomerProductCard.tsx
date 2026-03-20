@@ -91,7 +91,7 @@ export default function CustomerProductCard({product, userLat, userLng, showUnav
                 {/* Product Name */}
                 <div className="p-4">
                     {product.category && (
-                        <p className="text-xs text-primary font-semibold uppercase tracking-wide mb-1">
+                        <p className="inline-block text-xs text-primary font-semibold bg-green-50 px-2.5 py-1 rounded-full mb-2">
                             {product.category}
                         </p>
                     )}

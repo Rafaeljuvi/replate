@@ -210,14 +210,32 @@ export default function CustomerHomePage() {
                     <div className="flex-1 min-w-0">
 
                         {/* Mobile Greeting */}
-                        <div className="lg:hidden bg-gradient-to-r from-primary to-green-400 rounded-2xl p-5 text-white mb-6">
-                            <h1 className="text-xl font-bold">Hi, {user?.name?.split(' ')[0]}!</h1>
-                            <p className="text-green-100 text-sm mt-1">
-                                {locationStatus === 'granted'
-                                    ? 'Showing food within 2km of you'
-                                    : 'Discover discounted food around you'
-                                }
-                            </p>
+                        <div className="lg:hidden bg-gradient-to-br from-primary to-green-400 rounded-2xl p-5 text-white mb-6 overflow-hidden relative">
+                            <div className="absolute -top-4 -right-4 w-24 h-24 bg-white bg-opacity-10 rounded-full"></div>
+                            <div className="absolute -bottom-6 -right-2 w-32 h-32 bg-white bg-opacity-10 rounded-full"></div>
+                            <div className="relative z-10">
+                                <h2 className="text-xl font-bold leading-tight mb-1">
+                                    Hi, {user?.name?.split(' ')[0]}!
+                                </h2>
+                                <p className="text-green-100 text-xs mb-4">
+                                    Ready to rescue some food today?
+                                </p>
+                                <div className="bg-white bg-opacity-20 rounded-xl p-3 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <MapPin size={12} className="text-green-100 flex-shrink-0" />
+                                        <p className="text-green-100 text-xs">
+                                            {locationStatus === 'granted'
+                                                ? 'Showing food within 2km'
+                                                : 'Showing all available food'
+                                            }
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={11} className="text-green-100 flex-shrink-0"/>
+                                        <p className="text-green-100 text-xs">Updated just now</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Products Found + Category Filter */}
@@ -272,7 +290,7 @@ export default function CustomerHomePage() {
                                 {(searchQuery || selectedCategory !== 'All') && (
                                     <button
                                         onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-                                        className="px-4 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-50"
+                                        className="px-4 py-2 text-white font-semibold text-sm rounded-lg bg-primary hover:bg-gray-50 hover:text-primary"
                                     >
                                         Clear filters
                                     </button>

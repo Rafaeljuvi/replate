@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useForm, Controller} from 'react-hook-form';
-import {User, Mail, Phone, Lock, Store, MapPin, Clock, CreditCard, CheckCircle} from 'lucide-react';
+import {User, Mail, Phone, Lock, Store, MapPin, CreditCard, CheckCircle} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import {registerMerchantStep1, registerMerchantStep2, registerMerchantStep3} from '../services/api';

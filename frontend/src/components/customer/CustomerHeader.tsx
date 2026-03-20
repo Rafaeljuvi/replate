@@ -70,7 +70,7 @@ export default function CustomerHeader({
 
                         {/* Active Orders */}
                         <button
-                            onClick={() => navigate('/orders/shopping-cart')}
+                            onClick={() => navigate('/cart')}
                             title="Shopping Cart"
                             className="relative w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors text-gray-600"
                         >
