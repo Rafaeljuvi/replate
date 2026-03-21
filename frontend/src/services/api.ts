@@ -384,8 +384,8 @@ export const clearCart = async(): Promise<void> => {
 }
 
 //Orders APIs
-export const createOrder = async (notes?: string, paymentMethod?: string): Promise<Order[]> => {
-    const { data } = await api.post<ApiResponse<{ orders: Order[] }>>('/orders', {
+export const createOrder = async (notes?: string, paymentMethod?: string): Promise<any[]> => {
+    const { data } = await api.post<ApiResponse<{ orders: any[] }>>('/orders', {
         notes,
         payment_method: paymentMethod
     });

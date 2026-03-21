@@ -262,6 +262,7 @@ export interface CartData {
 }
 
 export interface Order {
+    snap_token: any;
     order_id: string;
     status: 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled';
     total_price: number;
