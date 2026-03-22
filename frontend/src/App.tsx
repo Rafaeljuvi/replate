@@ -21,6 +21,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import StoreDetailPage from './pages/StoreDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import ActiveOrdersPage from './pages/ActiveOrdersPage';
 
 
 // MERCHANT PAGES
@@ -155,6 +156,15 @@ function App() {
                 <CheckoutPage/>
             </ProtectedRoute>
           }>
+          </Route>
+
+          <Route path='/orders/active' element={
+            <ProtectedRoute allowedRoles={['user']}>
+              <ActiveOrdersPage/>
+            </ProtectedRoute>
+          }>
+        
+
           </Route>
 
           {/* ========================================

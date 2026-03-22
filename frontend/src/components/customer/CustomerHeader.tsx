@@ -68,7 +68,7 @@ export default function CustomerHeader({
                         {/* Divider */}
                         <div className="w-px h-6 bg-gray-200 mx-1"></div>
 
-                        {/* Active Orders */}
+                        {/* Shopping cart */}
                         <button
                             onClick={() => navigate('/cart')}
                             title="Shopping Cart"
@@ -82,9 +82,9 @@ export default function CustomerHeader({
                             )}
                         </button>
 
-                        {/* Ongoing Orders */}
+                        {/* Ongoing Orders / Active orders */}
                         <button
-                            onClick={() => navigate('/orders/ongoing_orders')}
+                            onClick={() => navigate('/orders/active')}
                             title="Ongoing Orders"
                             className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors text-gray-600"
                         >

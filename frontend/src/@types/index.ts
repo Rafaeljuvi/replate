@@ -280,6 +280,7 @@ export interface Order {
     total_quantity?: number;
     customer_name?: string;
     customer_phone?: string;
+    snap_redirect_url?: string;
 }
 
 export interface OrderItem {

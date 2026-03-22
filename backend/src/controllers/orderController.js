@@ -206,6 +206,8 @@ const getMyOrders = async(req, res) => {
                 o.notes,
                 o.payment_method,
                 o.payment_status,
+                o.snap_token,
+                o.snap_redirect_url,
                 o.created_at,
                 o.updated_at,
                 s.store_id,
@@ -284,6 +286,7 @@ const getOrderDetail = async (req, res) => {
                 oi.price_at_time,
                 oi.subtotal,
                 p.product_id,
+                p.image_url,
                 p.name,
                 p.category
             FROM order_items oi
