@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getMyOrders, cancelOrder, getOrderDetail } from "../services/api";
-import type { Order } from "../@types";
+import type { Order, OrderItem } from "../@types";
 import CustomerHeader from "../components/customer/CustomerHeader";
 
 declare global {
@@ -21,7 +21,7 @@ export default function ActiveOrdersPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [cancellingId, setCancellingId] = useState<string | null>(null)
     const [payingId, setPayingId] = useState<string | null>(null);
-    const [selectedOrder, setSelectedOrder] = useState<{order: any; items: any[]} | null>(null)
+    const [selectedOrder, setSelectedOrder] = useState<{order: Order; items: OrderItem[]} | null>(null)
     const [isLoadingDetail, setIsLoadingDetail] = useState(false)
     const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
 
