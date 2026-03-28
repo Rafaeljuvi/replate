@@ -531,11 +531,87 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+const getStoreOrderDetail = async(req, res) => {
+    try {
+        const userId = req.user.userId;
+        const {orderId} = req.params
+        
+        const storeResult = await pool.query(
+            `SELECT store_id FROM stores WHERE merchant_id = $1`, [userId]
+        )
+
+        if (storeResult.rows.length === 0) {
+            return res.status(404).json({success: false, message: 'Store not found'})
+        }
+
+        const storeId = storeResult.rows[0].store_id;
+
+        const orderResult = await pool.query(`
+                SELECT 
+                    o.order_id,
+                    o.status,
+                    o.total_price,
+                    o.notes,
+                    o.payment_method,
+                    o.payment_status,
+                    o.created_at,
+                    o.updated_at,
+                    s.store_id,
+                    s.store_name,
+                    s.logo_url as store_logo,
+                    s.address,
+                    s.phone as store_phone,
+                    u.name as customer_name,
+                    u.phone as customer_phone
+                FROM orders o
+                INNER JOIN stores s ON o.store_id = s.store_id
+                INNER JOIN users u ON o.user_id = u.user_id
+                WHERE o.order_id = $1 AND o.store_id = $2
+        `, [orderId, storeId])
+
+        if(orderResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            })
+        }
+
+        const itemsResult = await pool.query(`
+            SELECT
+                oi.order_item_id,
+                oi.quantity,
+                oi.price_at_time,
+                oi.subtotal,
+                p.product_id,
+                p.name,
+                p.image_url,
+                p.category
+            FROM order_items oi
+            INNER JOIN products p ON oi.product_id = p.product_id
+            WHERE oi.order_id = $1
+        `, [orderId]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                order: orderResult.rows[0],
+                items:itemsResult.rows
+            }
+        })
+    } catch (error) {
+        console.error('Get store order detail error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' });
+    }
+}
+
 module.exports = {
     createOrder,
     getMyOrders,
     getOrderDetail,
     cancelOrder,
     getStoreOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    getStoreOrderDetail
 };

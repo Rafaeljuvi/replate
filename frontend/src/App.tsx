@@ -30,6 +30,7 @@ import MerchantDashboard from './pages/MerchantDashboard';
 import MerchantPendingApprovalPage from './pages/MerchantPendingApprovalPage';
 import ManageProductsPage from './pages/ManageProductsPage';
 import StoreSettingsPage from './pages/StoreSettings';
+import ManageOrdersPage from './pages/ManageOrdersMerchant';
 
 
 // ADMIN PAGES
@@ -214,6 +215,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path='/merchant/orders' element={
+            <ProtectedRoute allowedRoles={['merchant']}>
+                <ManageOrdersPage/>
+            </ProtectedRoute>
+          }>
+
+          </Route>
 
           {/* ========================================
               ADMIN ROUTES (Protected)

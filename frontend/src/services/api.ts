@@ -408,15 +408,20 @@ export const cancelOrder = async (orderId: string): Promise<void> => {
 }
 
 //Merchant side of order APIs
-export const getStoreOrders = async(status?: string):Promise<Order[]> => {
-    const query = status ? `status=${status}` : '';
-    const { data } = await api.get<ApiResponse<Order[]>>(`/orders/store/list${query}`)
-    return data.data!
-}
+export const getStoreOrders = async (status?: string): Promise<Order[]> => {
+    const query = status ? `?status=${status}` : '';
+    const { data } = await api.get<ApiResponse<Order[]>>(`/orders/store/list${query}`);
+    return data.data!;
+};
 
 export const updateOrderStatus = async (orderId: string, status: string): Promise<void> => {
     await api.patch(`/orders/store/${orderId}/status`, { status });
 }
+
+export const getStoreOrderDetail = async (orderId: string): Promise<{ order: Order; items: OrderItem[] }> => {
+    const { data } = await api.get<ApiResponse<{ order: Order; items: OrderItem[] }>>(`/orders/store/${orderId}/detail`);
+    return data.data!;
+};
 
 
 export default api;

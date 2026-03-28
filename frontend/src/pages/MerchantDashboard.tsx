@@ -110,12 +110,12 @@ export default function MerchantDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-secondary">
       
       {/* ==================== HEADER ==================== */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-3 items-center gap-4">
+          <div className="flex items-center justify-between">
             
             {/* Left: Logo */}
             <div>
@@ -138,16 +138,6 @@ export default function MerchantDashboard() {
                 disabled={isRefreshing}
               >
                 Refresh
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="small"
-                leftIcon={<LogOut size={16} />}
-                onClick={handleLogout}
-                className='border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 disabled:bg-white hover:text-white disabled:text-red-500'
-              >
-                Logout
               </Button>
             </div>
           </div>
@@ -298,16 +288,13 @@ export default function MerchantDashboard() {
             <Button variant="primary" fullWidth onClick={() => navigate('/merchant/products')}>
               Manage Products
             </Button>
-            <Button variant="primary" fullWidth disabled>
-              🛒 View Orders
+            <Button variant="primary" fullWidth onClick={() => navigate('/merchant/orders')}>
+              View Orders
             </Button>
             <Button variant="primary" fullWidth onClick={() => navigate('/merchant/settings')}>
               Store Settings
             </Button>
           </div>
-          <p className="text-sm text-gray-500 mt-4 text-center">
-            Coming soon! These features will be available in the next update.
-          </p>
         </div>
       </div>
     </div>

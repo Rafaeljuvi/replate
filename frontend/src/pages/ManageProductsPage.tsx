@@ -160,7 +160,7 @@ export default function ManageProductsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-primary">
+        <div className="min-h-screen bg-secondary">
             {/* header */}
             <div className="bg-white shadow-lg">
                 <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
