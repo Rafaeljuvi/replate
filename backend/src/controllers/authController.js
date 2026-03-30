@@ -893,6 +893,116 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const {name, phone} = req.body;
+
+        if (!name || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name and phone number are required.'
+            })
+        }
+
+        if(!isValidPhoneNumber(phone)){
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid phone number format.'
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE users
+            SET name = $1, phone = $2, updated_at = CURRENT_TIMESTAMP
+            WHERE user_id = $3
+            RETURNING user_id, email, name, phone,role, is_verified
+            `, [name, phone, userId]
+        )
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found.'
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully.',
+            data: {
+                user: result.rows[0]
+            }
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error.'
+        })
+    }
+}
+
+const changePassword = async (req,res) => {
+    try {
+        const userId = req.user.userId
+        const {currentPassword, newPassword} = req.body
+
+        if(!currentPassword || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current password and new password are required.'
+            })
+        }
+
+        if(newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 8 characters long.'
+            })
+        }
+
+        const result = await pool.query(
+            'SELECT * FROM users WHERE user_id = $1', [userId]
+        )
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            })
+        }
+
+        const user = result.rows[0]
+
+        const isValid = await bcrypt.compare(currentPassword, user.password);
+        if(!isValid) {
+            return res.status(400).json({
+                success: false,
+                message: 'Current password is incorrect.'
+            })
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        await pool.query(
+            'UPDATE users SET password = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2', [hashedPassword, userId]
+        )
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully.'
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error.'
+        })
+    }
+}
+
 module.exports = {
     registerUser,
     RegisterMerchant,
@@ -904,7 +1014,9 @@ module.exports = {
     resendVerification,
     forgotPassword,
     resetPassword,
-    googleAuth
+    googleAuth,
+    updateProfile,
+    changePassword
 };
 
 

@@ -23,6 +23,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ActiveOrdersPage from './pages/ActiveOrdersPage';
 import OrderHistoryPage from './pages/OrderHistory';
+import ProfilePage from './pages/UserProfilePage';
 
 
 // MERCHANT PAGES
@@ -172,6 +173,15 @@ function App() {
               <OrderHistoryPage/>
             </ProtectedRoute>
           }>
+          </Route>
+
+          <Route path='/profile' element={
+            <ProtectedRoute allowedRoles={['user']}>
+              <ProfilePage/>
+            </ProtectedRoute>
+          }>
+
+
           </Route>
 
           {/* ========================================

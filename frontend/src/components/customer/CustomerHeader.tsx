@@ -105,7 +105,7 @@ export default function CustomerHeader({
 
                         {/* Profile */}
                         <button
-                            onClick={handleLogout}
+                            onClick={() => navigate('/profile')}
                             title={user?.name}
                             className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded-xl transition-colors"
                         >

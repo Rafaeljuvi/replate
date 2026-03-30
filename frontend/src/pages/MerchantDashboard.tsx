@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   RefreshCw, 
-  LogOut, 
   Package, 
   CheckCircle, 
   ShoppingBag, 
@@ -23,7 +22,7 @@ import StatsCard from '../components/merchant/StatsCard';
 
 
 export default function MerchantDashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [store, setStore] = useState<storeInfo | null>(null);
@@ -64,12 +63,6 @@ export default function MerchantDashboard() {
     await Promise.all([fetchStore(), fetchStats()]);
     setIsRefreshing(false);
     toast.success('Dashboard refreshed');
-  };
-
-  const handleLogout = () => {
-    logout();
-    toast.success('Logged out successfully');
-    navigate('/login');
   };
 
   useEffect(() => {

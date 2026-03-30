@@ -423,5 +423,25 @@ export const getStoreOrderDetail = async (orderId: string): Promise<{ order: Ord
     return data.data!;
 };
 
+export const updateProfile = async (
+    name: string,
+    phone: string
+) : Promise<User> => {
+    const {data} = await api.patch<ApiResponse<{user: User}>>('/auth/profile', {name, phone});
+    return data.data!.user
+}
+
+export const changePassword = async (
+    currentPassword: string,
+    newPassword: string
+): Promise<void> => {
+    try {
+        const response = await api.patch('/auth/change-password', { currentPassword, newPassword });
+        console.log('response:', response); // ← tambahkan
+    } catch (error: any) {
+        throw error; 
+    }
+};
+
 
 export default api;

@@ -9,6 +9,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean; 
   isLoading: boolean;
+  setUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,10 +31,11 @@ export function AuthProvider({ children }: AuthProviderProps) {  // ←
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ← FIX: useEffect INSIDE component
+
   useEffect(() => {
     const storedToken = getToken();
     const storedUser = getUser();
+    console.log('AuthContext init:', { storedToken, storedUser });
 
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -57,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {  // ←
     logoutUser();
   };
 
-  // ← FIX: Return statement
+
   return (
     <AuthContext.Provider
       value={{
@@ -65,8 +67,9 @@ export function AuthProvider({ children }: AuthProviderProps) {  // ←
         token,
         login: handleLogin,
         logout: handleLogout,
-        isAuthenticated: !!token && !!user,  // ← FIX: typo & check both
+        isAuthenticated: !!token && !!user,  
         isLoading,
+        setUser
       }}
     >
       {children}  

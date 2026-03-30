@@ -13,7 +13,9 @@ const{
     resendVerification,
     forgotPassword,
     resetPassword,
-    googleAuth 
+    googleAuth,
+    updateProfile,
+    changePassword 
 } = require('../controllers/authController');
 const {verifyToken} = require('../middleware/authMiddleware');
 
@@ -36,5 +38,7 @@ router.post('/reset-password', resetPassword);
 router.post('/login', login);
 router.post('/google', googleAuth);
 router.get('/profile', verifyToken, getProfile);
+router.patch('/profile', verifyToken, updateProfile);
+router.patch('/change-password', verifyToken, changePassword);
 
 module.exports = router;
