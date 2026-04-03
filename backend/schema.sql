@@ -226,3 +226,22 @@ CREATE INDEX idx_orders_user ON orders(user_id);
 CREATE INDEX idx_orders_store ON orders(store_id);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order ON order_items(order_id);
+
+-- -- =============================================
+-- -- Review n ratings table schema
+-- -- =============================================
+
+CREATE TABLE reviews (
+    review UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id UUID NOT NULL REFERENCES orders(order_id) ON DELETE CASCADE,
+    customer_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    store_id UUID NOT NULL REFERENCES stores(store_id) ON DELETE CASCADE,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(order_id)
+)
+
+CREATE INDEX idx_reviews_store ON reviews(store_id);
+CREATE INDEX idx_reviews_customer ON reviews(customer_id);

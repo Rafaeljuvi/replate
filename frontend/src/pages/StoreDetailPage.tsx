@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { MapPin, Clock, Star, Phone, Store, Package, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MapPin, Clock, Star, Phone, Store, Package, ChevronLeft, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { getPublicStoreById } from '../services/api';
-import type { PublicStore, PublicProduct } from '../@types';
+import { getPublicStoreById, getStoreReviews } from '../services/api';
+import type { PublicStore, PublicProduct, StoreReviews } from '../@types';
 import CustomerHeader from '../components/customer/CustomerHeader';
 import CustomerProductCard from '../components/customer/CustomerProductCard';
 
@@ -22,23 +22,28 @@ export default function StoreDetailPage() {
     const [isLoading, setIsLoading] = useState(true);
     const availableProducts = products.filter(p => p.is_available_now !== false);
     const [sortBy, setSortBy] = useState<'default' | 'discount_asc' | 'discount_desc'>('default')
+    const [reviews, setReviews] = useState<StoreReviews | null>(null);
 
-    const fetchStore = async () => {
-        if (!storeId) return;
-        try {
-            setIsLoading(true);
-            const data = await getPublicStoreById(storeId, lat, lng);
-            setStore(data.store);
-            setProducts(data.products);
-        } catch (error: any) {
-            toast.error('Store not found');
-            navigate('/home');
-        } finally {
-            setIsLoading(false);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [storeData, reviewsData] = await Promise.all([
+                    getPublicStoreById(storeId!, lat, lng),
+                    getStoreReviews(storeId!)
+                ]);
+                setStore(storeData.store);
+                setProducts(storeData.products);
+                setReviews(reviewsData);
+            } catch (error: any) {
+                toast.error('Failed to load store');
+                navigate('/dashboard');
+            } finally {
+                setIsLoading(false);
+            }
         }
-    };
+        fetchData();
+    }, [storeId])
 
-    useEffect(() => { fetchStore(); }, [storeId]);
 
     const getImageUrl = (imageUrl?: string) => {
         if (!imageUrl) return null;
@@ -232,26 +237,58 @@ export default function StoreDetailPage() {
                                 </div>
                             </div>
 
-                            {/* Reviews CTA */}
-                            <button
-                                onClick={() => navigate(`/stores/${storeId}/reviews`)}
-                                className="w-full bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 hover:bg-gray-50 transition-colors"
-                            >
-                                <div className="w-9 h-9 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <Star size={16} className="text-yellow-400 fill-yellow-400" />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <p className="text-sm font-semibold text-gray-700">See All Reviews</p>
-                                    <p className="text-xs text-gray-400">
-                                        {store.total_ratings
-                                            ? `${store.total_ratings} reviews`
-                                            : 'No reviews yet'
-                                        }
-                                    </p>
-                                </div>
-                                <ChevronRight size={14} className="text-gray-300" />
-                            </button>
+                            {/* Rating summary card */}
+                            {reviews && reviews.total > 0 && (
+                                <div className='bg-white rounded-2xl p-5 shadow-sm'>
+                                    <h3 className='text-sm font-bold text-gray-700 mb-4 flex items-center gap-2'>
+                                        <Star size={16} className='text-yellow-400 fill-yellow-400'/>
+                                        Rating Summary
+                                    </h3>
 
+                                    {/* Average Rating */}
+                                    <div className='flex items-center gap-3 mb-4'>
+                                        <span className='text-4xl font-bold text-gray-900'>
+                                            {Number(store?.average_rating).toFixed(1)}
+                                        </span>
+                                        <div>
+                                            <div className='flex gap-1'>
+                                                {[1,2,3,4,5].map((star) => (
+                                                    <Star
+                                                        key={star}
+                                                        size={14}
+                                                        className={star <= Math.round(Number(store?.average_rating))
+                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            : 'text-gray-200 fill-gray-200'
+                                                        }
+                                                    />
+                                                ))}
+                                            </div>
+                                            <p className='text-xs text-gray-400 mt-1'>{reviews.total} reviews</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Rating Distribution */}
+                                    <div className='space-y-2'>
+                                        {[1, 2, 3, 4, 5].map((star) => {
+                                            const count = reviews.distribution[star] || 0;
+                                            const percentage = reviews.total > 0? (count / reviews.total) * 100 : 0;
+                                            return (
+                                                <div key={star} className='flex items-center gap-2'>
+                                                    <span className='text-xs text-gray-500 w-3'>{star}</span>
+                                                    <Star size={10} className='text-yellow-400 fill-yellow-400 flex-shrink-0'/>
+                                                    <div className='flex-1 h-2 bg-gray-100 rounded-full overflow-hidden'>
+                                                        <div 
+                                                            className='h-full bg-yellow-400 rounded-full transition-all'
+                                                            style={{width: `${percentage}%`}}
+                                                        />
+                                                    </div>
+                                                    <span className='text-xs text-gray-400 w-4 text-right'>{count}</span>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </aside>
 
@@ -308,8 +345,76 @@ export default function StoreDetailPage() {
                                 ))}
                             </div>
                         )}
-                    </div>
 
+                        {/* Reviews Section */}
+                        {reviews && reviews.total > 0 && (
+                            <div className='mt-8'>
+                                <div className='bg-white max-w-sm rounded-full flex items-center'>
+                                    <h3 className='text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 ml-8 mt-3'>
+                                        <MessageSquare size={20} className='text-primary'/>
+                                        Customer Reviews
+                                        <span className='text-sm font-normal text-gray-400'>({reviews.total})</span>
+                                    </h3>
+                                </div>
+                                
+
+                                <div className='space-y-3 mt-2'>
+                                    {reviews.reviews.map((review) => (
+                                        <div key={review.review_id} className='bg-white rounded-2xl p-5 shadow-sm'>
+                                            <div className='flex items-start justify-between mb-3'>
+                                                <div className='flex items-center gap-3'>
+                                                    {/* Avatar */}
+                                                    <div className='w-10 h-10 rounded-full bg-primary bg-opacity-10 flex items-center justify-center flex-shrink-0'>
+                                                        <span className='text-sm font-bold text-primary'>
+                                                            {review.customer_name?.split(' ').map((n:string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p className='text-sm font-semibold text-gray-900'>{review.customer_name}</p>
+                                                        <div className="flex gap-0.5 mt-0.5">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <Star
+                                                                    key={star}
+                                                                    size={12}
+                                                                    className={star <= review.rating
+                                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                                        : 'text-gray-200 fill-gray-200'
+                                                                    }
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span className='text-xs text-gray-400'>
+                                                    {new Intl.DateTimeFormat('id-ID', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric'
+                                                    }).format(new Date(review.created_at))}
+                                                </span>
+                                            </div>
+
+                                            {review.comment && (
+                                                <p className='text-sm text-gray-600 leading-relaxed'>
+                                                    {review.comment}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {reviews && reviews.total === 0 && (
+                            <div className="mt-8 bg-white rounded-2xl p-8 shadow-sm text-center">
+                                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Star size={28} className="text-gray-300" />
+                                </div>
+                                <p className="text-sm font-semibold text-gray-600">No reviews yet</p>
+                                <p className="text-xs text-gray-400 mt-1">Be the first to review this store!</p>
+                            </div>
+                        )}
+                    </div>   
                 </div>
             </div>
         </div>

@@ -16,7 +16,6 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 // CUSTOMER PAGES
 import CustomerHomePage from './pages/CustomerDashboard';
 import MyRatingsPage from './pages/MyRatingsPage';
-import StoreReviewsPage from './pages/StoreReviewsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import StoreDetailPage from './pages/StoreDetailPage';
 import CartPage from './pages/CartPage';
@@ -118,9 +117,6 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          
-          {/* Store Reviews (Public - anyone can view) */}
-          <Route path="/stores/:storeId/reviews" element={<StoreReviewsPage />} />
 
           {/* product Detail */}
           <Route

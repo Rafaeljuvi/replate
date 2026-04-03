@@ -294,3 +294,21 @@ export interface OrderItem {
     image_url?: string;
     category?: string;
 }
+
+//review and rating
+export interface Review {
+    review_id: string;
+    order_id: string;
+    rating: number;
+    comment?: string;
+    created_at: string;
+    customer_name?: string;
+    store_name?: string;
+    store_logo?: string;
+}
+
+export interface StoreReviews {
+    reviews: Review[];
+    total: number;
+    distribution: Record<number, number>;
+}

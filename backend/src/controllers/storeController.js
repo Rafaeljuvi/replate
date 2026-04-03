@@ -92,14 +92,14 @@ const getMerchantStoreStats = async (req, res) => {
         //get statistics
         const statsResult = await pool.query(
             `SELECT
-            COUNT(p.product_id) AS total_products,
-            COUNT(p.product_id) FILTER (WHERE p.is_active = true) AS active_products,
-            0 AS total_orders,
-            0 AS pending_orders,
-            0 AS completed_orders,
-            0 AS total_revenue,
-            COALESCE(s.average_rating, 0) AS average_rating,
-            COALESCE(s.total_ratings, 0) AS total_ratings
+                COUNT(p.product_id) AS total_products,
+                COUNT(p.product_id) FILTER (WHERE p.is_active = true) AS active_products,
+                (SELECT COUNT(*) FROM orders WHERE store_id = $1) AS total_orders,
+                (SELECT COUNT(*) FROM orders WHERE store_id = $1 AND status = 'pending') AS pending_orders,
+                (SELECT COUNT(*) FROM orders WHERE store_id = $1 AND status = 'completed') AS completed_orders,
+                (SELECT COALESCE(SUM(total_price), 0) FROM orders WHERE store_id = $1 AND status = 'completed') AS total_revenue,
+                COALESCE(s.average_rating, 0) AS average_rating,
+                COALESCE(s.total_ratings, 0) AS total_ratings
             FROM stores s
             LEFT JOIN products p ON p.store_id = s.store_id
             WHERE s.store_id = $1

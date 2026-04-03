@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Package, Store, CheckCircle, XCircle, ChevronRight, Tag, X } from "lucide-react";
+import { ArrowLeft, Package, Store, CheckCircle, XCircle, ChevronRight, Tag, X, Star } from "lucide-react";
 import toast from 'react-hot-toast'
-import { getMyOrders, getOrderDetail } from "../services/api";
+import { getMyOrders, getOrderDetail, createReview, checkOrderReview } from "../services/api";
 import type { Order, OrderItem} from "../@types";
 import CustomerHeader from "../components/customer/CustomerHeader";
 
@@ -15,6 +15,12 @@ export default function OrderHistoryPage() {
     const [selectedOrder, setSelectedOrder] = useState<{order: Order; items: OrderItem[]} | null> (null);
     const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const [activeFilter, setActiveFilter] = useState<'all' | 'completed'| 'cancelled'>('all')
+    const [reviewingOrder, setReviewingOrder] = useState<Order | null>(null);
+    const [reviewRating, setReviewRating] = useState(0);
+    const [reviewComment, setReviewComment] = useState('');
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewedOrders, setReviewedOrders] = useState<Set<String>>(new Set());
+    const [hoveredStar, sethoveredStar] = useState(0);
 
     const fetchOrders = async () => {
         try {
@@ -23,7 +29,22 @@ export default function OrderHistoryPage() {
                 getMyOrders('completed'),
                 getMyOrders('cancelled')
             ])
-            setOrders([...completed, ...cancelled])
+            const allOrders = [...completed, ...cancelled];
+            setOrders(allOrders);
+
+            //Chwck which orders hasn't been reviewed
+            const reviewChecks = await Promise.all(
+                completed.map(order => checkOrderReview(order.order_id))
+            );
+
+            const reviewed = new Set<string>();
+            completed.forEach((order, index) => {
+                if (reviewChecks[index].hasReview) {
+                    reviewed.add(order.order_id);
+                }
+            })
+            setReviewedOrders(reviewed);
+
         } catch (error: any) {
             toast.error('Failed to load order history')
         } finally {
@@ -62,6 +83,28 @@ export default function OrderHistoryPage() {
             setIsLoadingDetail(false)
         }
     }
+
+    const handleSubmitReview = async () => {
+        if (!reviewingOrder) return;
+        if (reviewRating === 0) {
+            toast.error('Please provide a rating');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+        try {
+            await createReview(reviewingOrder.order_id, reviewRating, reviewComment || undefined)
+            toast.success('Review submitted');
+            setReviewedOrders(prev => new Set(prev).add(reviewingOrder.order_id));
+            setReviewingOrder(null);
+            setReviewRating(0);
+            setReviewComment('');
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to submit review')
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
 
     const filteredOrders = orders.filter(order => {
         if (activeFilter === 'all') return true;
@@ -217,6 +260,26 @@ export default function OrderHistoryPage() {
                                             : <>View Detail <ChevronRight size={14}/></>
                                         }
                                     </button>
+
+                                    {/* Write review */}
+                                    {order.status === 'completed' && (
+                                        reviewedOrders.has(order.order_id)
+                                            ? <div className="w-full py-2.5 bg-green-50 text-green-600 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 border border-green-100 mt-2">
+                                                <Star size={14} className="fill-green-500 text-green-500"/>
+                                                Reviewed
+                                            </div>
+                                            : <button
+                                                onClick={() => {
+                                                    setReviewingOrder(order);
+                                                    setReviewRating(0);
+                                                    setReviewComment('');
+                                                }}
+                                                className="w-full py-2.5 bg-yellow-50 text-yellow-600 text-sm font-semibold rounded-xl hover:bg-yellow-100 transition-colors flex items-center justify-center gap-2  mt-2"
+                                            >
+                                                <Star size={14}/>
+                                                Write Review
+                                            </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -355,6 +418,111 @@ export default function OrderHistoryPage() {
                             >
                                 Close
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Review Modal */}
+            {reviewingOrder && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-xl">
+
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                            <h3 className="font-bold text-gray-900">Write a Review</h3>
+                            <button
+                                onClick={() => {
+                                    setReviewingOrder(null);
+                                    setReviewRating(0);
+                                    setReviewComment('');
+                                }}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                            >
+                                <X size={18} className="text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="px-6 py-4 space-y-4">
+
+                            {/* Store Name */}
+                            <div className="text-center">
+                                <p className="text-sm text-gray-500">Reviewing</p>
+                                <p className="font-bold text-gray-900">{reviewingOrder.store_name}</p>
+                            </div>
+
+                            {/* Star Rating */}
+                            <div>
+                                <p className="text-xs text-gray-500 font-medium mb-2 text-center">
+                                    Your Rating <span className="text-red-400">*</span>
+                                </p>
+                                <div className="flex justify-center gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            onMouseEnter={() => sethoveredStar(star)}
+                                            onMouseLeave={() => sethoveredStar(0)}
+                                            onClick={() => setReviewRating(star)}
+                                            className="transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                size={36}
+                                                className={`transition-colors ${
+                                                    star <= (hoveredStar || reviewRating)
+                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                                {reviewRating > 0 && (
+                                    <p className="text-center text-sm font-semibold mt-2 text-yellow-500">
+                                        {reviewRating === 1 ? 'Poor' :
+                                        reviewRating === 2 ? 'Fair' :
+                                        reviewRating === 3 ? 'Good' :
+                                        reviewRating === 4 ? 'Very Good' : 'Excellent!'}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Comment */}
+                            <div>
+                                <label className="text-xs text-gray-500 font-medium mb-1 block">
+                                    Comment <span className="text-gray-400">(optional)</span>
+                                </label>
+                                <textarea
+                                    value={reviewComment}
+                                    onChange={(e) => setReviewComment(e.target.value)}
+                                    placeholder="Share your experience..."
+                                    rows={3}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                                />
+                            </div>
+
+                            {/* Buttons */}
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        setReviewingOrder(null);
+                                        setReviewRating(0);
+                                        setReviewComment('');
+                                    }}
+                                    className="flex-1 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSubmitReview}
+                                    disabled={reviewRating === 0 || isSubmittingReview}
+                                    className="flex-1 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-green-600 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                                >
+                                    {isSubmittingReview
+                                        ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        : 'Submit Review'
+                                    }
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

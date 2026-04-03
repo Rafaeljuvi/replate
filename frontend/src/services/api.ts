@@ -20,7 +20,10 @@ import type {
     PublicStore,
     CartData,
     Order,
-    OrderItem
+    OrderItem,
+    StoreReviews,
+    Review
+
 } from '../@types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -443,5 +446,33 @@ export const changePassword = async (
     }
 };
 
+// =============================================
+// REVIEW APIs
+// =============================================
+export const createReview = async (
+    orderId: string,
+    rating: number,
+    comment?: string
+): Promise<void> => {
+    await api.post('/reviews', { orderId, rating, comment });
+};
+
+export const checkOrderReview = async (orderId: string): Promise<{
+    hasReview: boolean;
+    review: { review_id: string; rating: number; comment: string } | null;
+}> => {
+    const { data } = await api.get(`/reviews/check/${orderId}`);
+    return data.data;
+};
+
+export const getStoreReviews = async (storeId: string): Promise<StoreReviews> => {
+    const { data } = await api.get(`/reviews/store/${storeId}`);
+    return data.data;
+};
+
+export const getMyReviews = async (): Promise<Review[]> => {
+    const { data } = await api.get('/reviews/my-reviews');
+    return data.data;
+};
 
 export default api;
