@@ -366,43 +366,32 @@ const registerStoreInfo = async (req, res) => {
 
 // Register Merchant Verfication
 // Page 3
-
 const registerStoreVerification = async (req, res) => {
+    console.log('req.files:', req.files); // ← tambahkan
+    console.log('req.body:', req.body);   
     try {
         const merchantID = req.user.userId;
-        const {bankAccountNumber} = req.body;
 
-        let qrisImageUrl = null;
         let idCardImageUrl = null;
 
-       if(req.files && req.files.length > 0){
-         req.files.forEach(file => {
-            
-            if(file.fieldname === 'qrisImage') {
-                qrisImageUrl = `/uploads/${file.filename}`
-            }
-
-            if (file.fieldname === 'idCardImage'){
-                idCardImageUrl = `/uploads/${file.filename}`;
-            }
-         });
+       if(req.files && req.files.idCardImage && req.files.idCardImage.length > 0) {
+        idCardImageUrl = `/uploads/merchant/id-cards/${req.files.idCardImage[0].filename}`;
        }
 
-        if(!bankAccountNumber){
+        if(!idCardImageUrl) {
             return res.status(400).json({
                 success: false,
-                message: 'Bank account number is required.'
+                message: 'ID Card image is required.'
             });
         }
 
-
         const result = await pool.query(
-            `UPDATE stores SET bank_account_number = $1,
-            qris_image_url = $2,
-            id_card_image_url = $3,
-            updated_at = CURRENT_TIMESTAMP
-            WHERE merchant_id = $4
-            RETURNING *`, [bankAccountNumber,qrisImageUrl, idCardImageUrl, merchantID]
+            `UPDATE stores SET
+                id_card_image_url = $1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE merchant_id = $2
+            RETURNING *`,
+            [idCardImageUrl, merchantID]
         );
 
         if (result.rows.length === 0) {
@@ -412,9 +401,9 @@ const registerStoreVerification = async (req, res) => {
             });
         }
 
-        //Get merchant user info
         const userResult = await pool.query(
-            'SELECT user_id, email, name, is_verified FROM users WHERE user_id = $1', [merchantID]
+            'SELECT user_id, email, name, is_verified FROM users WHERE user_id = $1',
+            [merchantID]
         );
 
         if (userResult.rows.length === 0) {
@@ -426,12 +415,11 @@ const registerStoreVerification = async (req, res) => {
 
         const user = userResult.rows[0];
 
-        //Send email verification
         let emailSent = false;
         let verificationToken = null;
 
         if (!user.is_verified) {
-            const jwt = require('jsonwebtoken')
+            const jwt = require('jsonwebtoken');
             verificationToken = jwt.sign(
                 {
                     userId: user.user_id,
@@ -455,22 +443,22 @@ const registerStoreVerification = async (req, res) => {
             success: true,
             message: user.is_verified
                 ? 'Store registration completed. Waiting for admin approval.'
-                : 'Store registration completed! Please check your email to verify your account before admin review.',
+                : 'Store registration completed! Please check your email to verify your account.',
             data: {
                 store: result.rows[0],
-                emailSent: emailSent,
+                emailSent,
                 needsVerification: !user.is_verified,
             },
         });
 
     } catch (error) {
-        console.error('Register Store Verfication Error:', error);
+        console.error('Register Store Verification Error:', error);
         res.status(500).json({
             success: false,
             message: 'Internal Server Error'
         });
     }
-}
+};
 
 // Login
 const login = async (req, res) => {

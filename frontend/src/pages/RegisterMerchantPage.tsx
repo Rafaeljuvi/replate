@@ -338,23 +338,25 @@ function Step2StoreInfo({ onNext, onBack }: {onNext: () => void; onBack: () => v
 // Step 3: verification
 function Step3Verification({onBack}: {onBack: () => void}){
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false)
-  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const {
-    register,
     handleSubmit,
     control,
-    formState: {errors}
+    formState: { errors }
   } = useForm<RegisterMerchantStep3Data>();
 
   const onSubmit = async (data: RegisterMerchantStep3Data) => {
+    if (!data.idCardImage) {
+      toast.error('Please upload your ID Card');
+      return;
+    }
     try {
       setIsLoading(true);
       await registerMerchantStep3(data);
-      
       toast.success('Registration complete!');
-      setRegistrationSuccess(true);  
+      setRegistrationSuccess(true);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to complete registration');
     } finally {
@@ -362,24 +364,20 @@ function Step3Verification({onBack}: {onBack: () => void}){
     }
   };
 
-  if(registrationSuccess) {
+  if (registrationSuccess) {
     return (
       <div className='text-center'>
         <div className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4'>
           <CheckCircle className='w-10 h-10 text-green-600'/>
         </div>
-
         <h2 className='text-2xl font-bold text-gray-800 mb-2'>
-          Registration Succesful
+          Registration Successful
         </h2>
-
         <p className="text-gray-600 mb-6">
           We've sent a verification email to your inbox.
           <br />
           Please verify your email to continue.
         </p>
-
-        {/* Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
           <p className="text-sm text-blue-800 font-semibold">📋 Next steps:</p>
           <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside">
@@ -389,100 +387,64 @@ function Step3Verification({onBack}: {onBack: () => void}){
             <li>Wait for admin approval (1-3 business days)</li>
           </ul>
         </div>
-
-        {/* Login Button */}
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={() => navigate('/login')}
-        >
+        <Button variant="primary" size="medium" fullWidth onClick={() => navigate('/login')}>
           Go to Login
         </Button>
       </div>
-    )
+    );
   }
 
   return (
     <div>
-      <div className='text-center mb-6'> 
-        <h2 className='text-wxl font-bold text-gray-800'>
-          Verification
+      <div className='text-center mb-6'>
+        <h2 className='text-xl font-bold text-gray-800'>
+          Identity Verification
         </h2>
         <p className='text-gray-600 text-sm mt-1'>
-          Step 3 of 3
+          Step 3 of 3 — Upload your ID Card for verification
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-        <Input
-        label="Bank account number"
-        placeholder='10-16 digits'
-        leftIcon={<CreditCard size={20}/>}
-        error={errors.bankAccountNumber?.message}
-        {...register('bankAccountNumber', {
-          required: 'Banl Account Required',
-          pattern:{
-            value: /^[0-9]{10,16}$/,
-            message: 'Invalid account number'
-          }
-        })}
-        />
 
-        <Controller
-          name='qrisImage'
-          control = {control}
-          render={({field}) => (
-            <FileUpload
-              label="QRIS Code (Optional)"
-              accept='image/*'
-              maxSize={5}
-              value={field.value || null}
-              onChange={field.onChange}
-              helperText='Max 5MB'
-            />
-          )}
-        />
-
+        {/* ID Card Upload — required */}
         <Controller
           name="idCardImage"
           control={control}
+          rules={{ required: 'ID Card is required' }}
           render={({ field }) => (
             <FileUpload
-              label="ID Card (Optional)"
+              label="ID Card (KTP) *"
               accept="image/*"
               maxSize={5}
               value={field.value || null}
               onChange={field.onChange}
-              helperText="Max 5MB"
+              helperText="Max 5MB — JPG, PNG"
+              error={errors.idCardImage?.message}
             />
           )}
         />
 
         <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
-          <p className='text-sm text-blue-800 font-semibold'>
-              What's Next:
-          </p>
+          <p className='text-sm text-blue-800 font-semibold'>What's Next:</p>
           <ul className='text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside'>
-            <li>Verify your Email</li>
+            <li>Verify your email</li>
             <li>Admin review (1-3 working days)</li>
-            <li>Start managing products</li>
+            <li>Start managing your products</li>
           </ul>
         </div>
 
         <div className='flex gap-3 mt-4'>
-            <Button type='button' variant="outline" onClick=        {onBack} className='flex-1'>
-             ← Back
-            </Button>
-
-            <Button type='submit' variant='primary' fullWidth isLoading={isLoading} className='flex-1'>
-              {isLoading ? 'Submitting...' : 'Complete ✓'}
-            </Button>
+          <Button type='button' variant="outline" onClick={onBack} className='flex-1'>
+            ← Back
+          </Button>
+          <Button type='submit' variant='primary' fullWidth isLoading={isLoading} className='flex-1'>
+            {isLoading ? 'Submitting...' : 'Complete Registration'}
+          </Button>
         </div>
       </form>
     </div>
   );
-
 }
 
 

@@ -26,8 +26,6 @@ const getMerchantStore = async(req,res) => {
                 operating_hours,
                 logo_url,
                 banner_url,
-                bank_account_number,
-                qris_image_url,
                 is_active,
                 approval_status,  
                 admin_notes,
@@ -132,7 +130,7 @@ const updateMerchantStore = async (req, res) => {
          }
 
          const {
-            store_name, description, address, city,phone, operating_hours, bank_account_number
+            store_name, description, address, city,phone, operating_hours
          } = req.body
 
          const fieldsToUpdate = [];
@@ -145,7 +143,6 @@ const updateMerchantStore = async (req, res) => {
          if(city !== undefined) {fieldsToUpdate.push(`city = $${paramCount++}`); values.push(city)}
          if(phone !== undefined) {fieldsToUpdate}
          if(operating_hours !==  undefined) {fieldsToUpdate.push(`operating_hours = $${paramCount++}`); values.push(operating_hours)}
-         if(bank_account_number !== undefined) {fieldsToUpdate.push(`bank_account_number = $${paramCount++}`); values.push(bank_account_number)}
          if(req.file) {fieldsToUpdate.push(`logo_url = $${paramCount++}`); values.push(`/uploads/merchant/logos/${req.file.filename}`)}
 
          if(fieldsToUpdate.length === 0) {

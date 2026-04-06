@@ -42,8 +42,6 @@ export interface RegisterMerchantStep2Data{
 }
 
 export interface RegisterMerchantStep3Data{
-    bankAccountNumber: string;
-    qrisImage?: File;
     idCardImage?: File;
 }
 

@@ -114,12 +114,7 @@ export const registerMerchantStep1 = async (userData: RegisterMerchantStep1Data)
   };
   
 export const registerMerchantStep3 = async (verificationData: RegisterMerchantStep3Data) => {
-const formData = new FormData();
-formData.append('bankAccountNumber', verificationData.bankAccountNumber);
-
-    if (verificationData.qrisImage) {
-    formData.append('qrisImage', verificationData.qrisImage);
-    }
+    const formData = new FormData();
 
     if (verificationData.idCardImage) {
         formData.append('idCardImage', verificationData.idCardImage);

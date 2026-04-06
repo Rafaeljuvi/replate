@@ -12,8 +12,6 @@ const getPendingStores = async (req, res) => {
                 s.city,
                 s.phone,
                 s.operating_hours,
-                s.bank_account_number,
-                s.qris_image_url,
                 s.id_card_image_url,
                 s.approval_status,
                 s.created_at,
