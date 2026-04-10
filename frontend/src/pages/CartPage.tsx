@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { getCart, updateCartItem, removeCartItem, clearCart } from "../services/api";
 import type { CartData, CartItem } from "../@types";
 import CustomerHeader from "../components/customer/CustomerHeader";
+import CustomerFooter from "../components/layout/Footer";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
@@ -306,6 +307,7 @@ export default function CartPage() {
                     </div>
                 </div>
             )}
+            <CustomerFooter/>
         </div>
     )
 }

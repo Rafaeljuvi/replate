@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 interface LogoProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  align?:'left' | 'center'
 }
 
-export default function Logo({ size = 'medium', className = '' }: LogoProps) {
+export default function Logo({ size = 'medium', className = '', align ='center' }: LogoProps) {
   // Size classes untuk SVG logo
   const logoSizes = {
     small: 'w-8 h-8',
@@ -28,7 +29,7 @@ export default function Logo({ size = 'medium', className = '' }: LogoProps) {
 
   return (
     // <Link to="/" className={`inline-block ${className}`}>
-      <div className="flex justify-center items-center gap-3">
+      <div className={`flex ${align === 'left' ? 'justify-start' : 'justify-center'} items-center gap-3`}>
         {/* Logo SVG */}
         <svg 
           className={logoSizes[size]} 

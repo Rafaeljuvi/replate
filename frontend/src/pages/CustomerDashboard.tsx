@@ -7,6 +7,7 @@ import { getPublicProducts } from '../services/api';
 import type { PublicProduct } from '../@types';
 import CustomerProductCard from '../components/customer/CustomerProductCard';
 import CustomerHeader from '../components/customer/CustomerHeader';
+import CustomerFooter from '../components/layout/Footer';
 
 const CATEGORIES = ['All', 'Bread', 'Pastry', 'Cake', 'Cookies', 'Muffins', 'Croissants', 'Bagels', 'Tarts', 'Other'];
 
@@ -88,7 +89,7 @@ export default function CustomerHomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-secondary">
+        <div className="min-h-screen bg-secondary flex flex-col">
             {/* Header */}
             <CustomerHeader
             locationStatus={locationStatus}
@@ -312,6 +313,7 @@ export default function CustomerHomePage() {
                     </div>
                 </div>
             </div>
+            <CustomerFooter/>
         </div>
     );
 }

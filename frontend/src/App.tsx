@@ -15,7 +15,6 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 
 // CUSTOMER PAGES
 import CustomerHomePage from './pages/CustomerDashboard';
-import MyRatingsPage from './pages/MyRatingsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import StoreDetailPage from './pages/StoreDetailPage';
 import CartPage from './pages/CartPage';
@@ -104,16 +103,6 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['user']}>
                 <CustomerHomePage/>
-              </ProtectedRoute>
-            } 
-          />
-          
-          {/* My Ratings */}
-          <Route 
-            path="/my-ratings" 
-            element={
-              <ProtectedRoute allowedRoles={['user']}>
-                <MyRatingsPage />
               </ProtectedRoute>
             } 
           />

@@ -6,6 +6,7 @@ import { getPublicStoreById, getStoreReviews } from '../services/api';
 import type { PublicStore, PublicProduct, StoreReviews } from '../@types';
 import CustomerHeader from '../components/customer/CustomerHeader';
 import CustomerProductCard from '../components/customer/CustomerProductCard';
+import CustomerFooter from '../components/layout/Footer';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
@@ -417,6 +418,7 @@ export default function StoreDetailPage() {
                     </div>   
                 </div>
             </div>
+            <CustomerFooter/>
         </div>
     );
 }

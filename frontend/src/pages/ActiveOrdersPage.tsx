@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { getMyOrders, cancelOrder, getOrderDetail } from "../services/api";
 import type { Order, OrderItem } from "../@types";
 import CustomerHeader from "../components/customer/CustomerHeader";
+import CustomerFooter from "../components/layout/Footer";
 
 declare global {
     interface Window {snap: any;}
@@ -463,6 +464,7 @@ export default function ActiveOrdersPage() {
                     </div>
                 </div>
             )}
+            <CustomerFooter/>
         </div>
     )
 }
