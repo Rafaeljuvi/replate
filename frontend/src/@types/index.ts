@@ -293,6 +293,28 @@ export interface OrderItem {
     category?: string;
 }
 
+export interface DailyStats {
+    date: string;
+    total_orders: number;
+    total_revenue: number;
+    total_items_sold: number;
+}
+
+export interface TopProduct {
+    product_id: string;
+    name: string;
+    image_url?: string;
+    discounted_price: number;
+    total_sold: number;
+    total_revenue: number;
+    total_orders: number;
+}
+
+export interface TopSellingProducts {
+    period: string;
+    products: TopProduct[];
+}
+
 //review and rating
 export interface Review {
     review_id: string;
@@ -310,3 +332,4 @@ export interface StoreReviews {
     total: number;
     distribution: Record<number, number>;
 }
+

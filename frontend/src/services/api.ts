@@ -22,7 +22,9 @@ import type {
     Order,
     OrderItem,
     StoreReviews,
-    Review
+    Review,
+    DailyStats,
+    TopSellingProducts
 
 } from '../@types';
 
@@ -435,11 +437,22 @@ export const changePassword = async (
 ): Promise<void> => {
     try {
         const response = await api.patch('/auth/change-password', { currentPassword, newPassword });
-        console.log('response:', response); // ← tambahkan
+        console.log('response:', response); 
     } catch (error: any) {
         throw error; 
     }
 };
+
+export const getDailyStats = async (date?: string) : Promise<DailyStats> => {
+    const query = date ? `?date=${date}` : '';
+    const { data } = await api.get(`/merchant/store/daily-stats${query}`)
+    return data.data;
+}
+
+export const getTopSellingProducts = async (period: 'weekly' | 'monthly' = 'weekly'): Promise<TopSellingProducts> => {
+    const {data} = await api.get(`/merchant/store/top-products?period=${period}`)
+    return data.data;
+}
 
 // =============================================
 // REVIEW APIs

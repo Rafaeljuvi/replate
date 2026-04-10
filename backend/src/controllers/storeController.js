@@ -173,8 +173,110 @@ const updateMerchantStore = async (req, res) => {
 
 }
 
+//get daily Revenue & sales
+const getDailyStats = async (req, res) => {
+    try {
+        const merchantId = req.user.userId;
+        const {date} = req.query
+
+        const targetDate = date || new Date().toISOString().split('T')[0];
+
+        const storeResult = await pool.query(
+            'SELECT store_id FROM stores WHERE merchant_id = $1', [merchantId]
+        )
+
+        if(storeResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Store not found'
+            })
+        }
+
+        const storeId = storeResult.rows[0].store_id
+
+        //Revenue & daily orders
+        const dailyResult = await pool.query(`
+            SELECT
+                COUNT(DISTINCT o.order_id) AS total_orders,
+                COALESCE(SUM(o.total_price), 0) AS total_revenue,
+                COALESCE(SUM(oi.quantity), 0) AS total_items_sold
+            FROM orders o
+            INNER JOIN order_items oi ON o.order_id = oi.order_id
+            WHERE o.store_id = $1
+            AND o.status = 'completed'
+            AND DATE(o.created_at) = $2
+        `, [storeId, targetDate])
+
+        res.status(200).json({
+            success: true,
+            data: {
+                date: targetDate,
+                ...dailyResult.rows[0]
+            }
+        })
+    } catch (error) {
+        console.error('Get daily stats error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
+//Get top selling products
+const getTopSellingProducts = async (req, res) => {
+    try {
+        const merchantId = req.user.userId;
+        const { period } = req.query;
+
+        const storeResult = await pool.query(
+            'SELECT store_id FROM stores WHERE merchant_id = $1', [merchantId]
+        )
+
+        if (storeResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false, message: 'Store not found'
+            })
+        }
+
+        const storeId = storeResult.rows[0].store_id;
+
+        const interval = period === 'monthly' ? '1 Month' : '7 Days';
+
+        const result = await pool.query(`
+            SELECT
+                p.product_id,
+                p.name,
+                p.image_url,
+                p.discounted_price,
+                SUM(oi.quantity) as total_sold,
+                SUM(oi.subtotal) as total_revenue,
+                COUNT(DISTINCT o.order_id) as total_orders
+            FROM order_items oi
+            INNER JOIN orders o ON oi.order_id = o.order_id
+            INNER JOIN products p ON oi.product_id = p.product_id
+            WHERE o.store_id = $1
+            AND o.status = 'completed'
+            AND o.created_at >= NOW() - INTERVAL '${interval}'
+            GROUP BY p.product_id, p.name, p.image_url, p.discounted_price
+            ORDER BY total_sold DESC
+            LIMIT 5
+        `, [storeId]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                period: period || 'weekly',
+                products: result.rows
+            }
+        });
+    } catch (error) {
+        console.error('Get top selling products error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+}
+
 module.exports = {
     getMerchantStore,
     getMerchantStoreStats,
-    updateMerchantStore
+    updateMerchantStore,
+    getDailyStats,
+    getTopSellingProducts
 };
