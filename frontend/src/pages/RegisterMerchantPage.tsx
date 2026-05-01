@@ -12,28 +12,56 @@ import Button from '../components/ui/Button';
 import MapPicker from '../components/ui/MapPicker';
 import FileUpload from '../components/ui/FileUpload';
 import OperatingHoursInput from '../components/ui/OperatingHourseInput';
+import Logo from '../components/layout/Logo';
 
 export default function RegisterMerchantPage() {
   const [currentStep, setCurrentStep] = useState(1);
-    return (
-      <AuthLayout>
-        <div className='space-y-6'>
-          {/* progress indicator */}
-          <div className='flex items-center justify-between mb-8'>
-            <StepIndicator step={1} active={currentStep >= 1} label="Account" />
-            <ProgressBar progress={currentStep >= 2 ? 100 : 0} />
-            <StepIndicator step={2} active={currentStep >= 2} label="Bakery Details"/>
-            <ProgressBar progress={currentStep >= 3 ? 100 : 0} />
-            <StepIndicator step={3} active={currentStep >= 3} label="Verification"/>
-          </div>
 
-          {/* Step content */}
-          {currentStep === 1 && <Step1Account onNext={() => setCurrentStep(2)} />}
-          {currentStep === 2 && (<Step2StoreInfo onNext={() => setCurrentStep(3)} onBack={() => setCurrentStep(1)} />)}
-          {currentStep === 3 && (<Step3Verification onBack={() => setCurrentStep(2)} />)}
+  if (currentStep === 2) {
+    return (
+      <div className="min-h-screen bg-secondary flex items-center justify-center py-8 px-4">
+        <div className="w-full max-w-4xl">
+          <div className="bg-white rounded-2xl p-8 shadow-sm">
+            
+            {/* Logo */}
+            <div className="flex flex-col items-center mb-6">
+              <Logo size="small" />
+            </div>
+
+            {/* Progress Bar */}
+            <div className="flex items-center justify-between mb-8">
+              <StepIndicator step={1} active={currentStep >= 1} label="Account" />
+              <ProgressBar progress={100} />
+              <StepIndicator step={2} active={currentStep >= 2} label="Bakery Details" />
+              <ProgressBar progress={0} />
+              <StepIndicator step={3} active={currentStep >= 3} label="Verification" />
+            </div>
+
+            {/* Step 2 Content */}
+            <Step2StoreInfo
+              onNext={() => setCurrentStep(3)}
+              onBack={() => setCurrentStep(1)}
+            />
+          </div>
         </div>
-      </AuthLayout>
+      </div>
     );
+  }
+  return (
+    <AuthLayout>
+      <div className='space-y-6'>
+        <div className='flex items-center justify-between mb-8'>
+          <StepIndicator step={1} active={currentStep >= 1} label="Account" />
+          <ProgressBar progress={currentStep >= 2 ? 100 : 0} />
+          <StepIndicator step={2} active={currentStep >= 2} label="Bakery Details"/>
+          <ProgressBar progress={currentStep >= 3 ? 100 : 0} />
+          <StepIndicator step={3} active={currentStep >= 3} label="Verification"/>
+        </div>
+        {currentStep === 1 && <Step1Account onNext={() => setCurrentStep(2)} />}
+        {currentStep === 3 && <Step3Verification onBack={() => setCurrentStep(2)} />}
+      </div>
+    </AuthLayout>
+  );
 }
 
 //Progress compoenents
@@ -202,8 +230,7 @@ function Step2StoreInfo({ onNext, onBack }: {onNext: () => void; onBack: () => v
 
   const onSubmit = async (data: RegisterMerchantStep2Data) => {
     try {
-      setIsLoading(true)
-
+      setIsLoading(true);
       const payload = {
         storeName: data.storeName,
         description: data.description,
@@ -214,11 +241,9 @@ function Step2StoreInfo({ onNext, onBack }: {onNext: () => void; onBack: () => v
         phone: data.phone,
         operatingHours: data.operatingHours
       };
-
       await registerMerchantStep2(payload);
       toast.success('Store info saved');
       onNext();
-
     } catch (error:any) {
       toast.error(error.response?.data?.message || 'Failed to save');
     } finally {
@@ -229,108 +254,123 @@ function Step2StoreInfo({ onNext, onBack }: {onNext: () => void; onBack: () => v
   return (
     <div>
       <div className='text-center mb-6'>
-        <h2 className='text-2xl font-bold text-gray-800'>
-            Store Information
-        </h2>
-        <p className='text-gray-600 text-sm mt-1'>
-            Step 2 of 3
-        </p>
+        <h2 className='text-2xl font-bold text-gray-800'>Store Information</h2>
+        <p className='text-gray-600 text-sm mt-1'>Step 2 of 3</p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-        <Input
-        label='Store Name'
-        placeholder='e.g., Sweet Bakery'
-        leftIcon = {<Store size={20}/>}
-        error = {errors.storeName?.message}
-        {...register('storeName', {
-          required: 'Store name required',
-          minLength: {value: 3, message:'Min 3 characters'}
-        })}
-        />
 
-        <div>
-          <label className='block text-sm font-medium text-gray-700 mb-1.5'>
-            Description <span className='text-red-500'>*</span>
-          </label>
-          <textarea
-            placeholder='Tell customers about your store...'
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 resize-none ${errors.description ? 'border-red-500' : 'border-gray-300 focus:ring-primary'}`}
-            rows={4}
-            {...register('description', {
-              required: 'Description required',
-              minLength: {value: 20, message: 'Min 20 characters'},
-              maxLength: {value: 500, message: 'Max 500 characters'}
-            })}
-          />
-          {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='grid grid-cols-2 gap-6'>
+
+            {/* Kolom Kiri */}
+            <div className='space-y-4'>
+                <div className='grid grid-cols-2 gap-3'>
+                    <Input
+                        label='Store Name'
+                        placeholder='e.g., Sweet Bakery'
+                        leftIcon={<Store size={20}/>}
+                        error={errors.storeName?.message}
+                        {...register('storeName', {
+                            required: 'Store name required',
+                            minLength: {value: 3, message: 'Min 3 characters'}
+                        })}
+                    />
+                    <Input
+                        label="City"
+                        placeholder="e.g., Jakarta"
+                        leftIcon={<MapPin size={20} />}
+                        error={errors.city?.message}
+                        {...register('city', { required: 'City required' })}
+                    />
+                    <Input
+                        label="Address"
+                        placeholder="Street address"
+                        leftIcon={<MapPin size={20}/>}
+                        error={errors.address?.message}
+                        {...register('address', {
+                            required: 'Address required',
+                            minLength: { value: 10, message: "Enter complete address"}
+                        })}
+                    />
+                    <Input
+                        label="Store Phone"
+                        type="tel"
+                        placeholder="08xxxxxxxxx"
+                        leftIcon={<Phone size={20} />}
+                        error={errors.phone?.message}
+                        {...register('phone', {
+                            required: 'Phone required',
+                            pattern: {
+                                value: /^(08|628|\+628)[0-9]{8,11}$/,
+                                message: 'Invalid phone'
+                            }
+                        })}
+                    />
+                </div>
+
+                {/* Description */}
+                <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-1.5'>
+                        Description <span className='text-red-500'>*</span>
+                    </label>
+                    <textarea
+                        placeholder='Tell customers about your store...'
+                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 resize-none h-28 ${
+                            errors.description ? 'border-red-500' : 'border-gray-300 focus:ring-primary'
+                        }`}
+                        {...register('description', {
+                            required: 'Description required',
+                            minLength: {value: 20, message: 'Min 20 characters'},
+                            maxLength: {value: 500, message: 'Max 500 characters'}
+                        })}
+                    />
+                    {errors.description && (
+                        <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>
+                    )}
+                </div>
+
+                {/* Map Picker — di bawah description */}
+                <Controller
+                    name="location"
+                    control={control}
+                    rules={{ required: 'Select location on map' }}
+                    render={({ field }) => (
+                        <MapPicker
+                            label="Store Location"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.location?.message || ''}
+                        />
+                    )}
+                />
+            </div>
+
+            {/* Kolom Kanan — hanya Operating Hours */}
+            <div>
+                <Controller
+                    name='operatingHours'
+                    control={control}
+                    rules={{required: 'Operating hours required'}}
+                    render={({field}) => (
+                        <OperatingHoursInput
+                            label='Operating hours'
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.operatingHours?.message}
+                        />
+                    )}
+                />
+            </div>
         </div>
-        
-        <Input
-          label ="Address"
-          placeholder = "Street address"
-          leftIcon={<MapPin size={20}/>}
-          error = {errors.address?.message}
-          {...register('address', {
-            required: 'Address required',
-            minLength: { value: 10, message:"Enter your complete address"}
-          })}
-        />
 
-        <Input
-          label="City"
-          placeholder="e.g., Jakarta"
-          leftIcon={<MapPin size={20} />}
-          error={errors.city?.message}
-          {...register('city', { required: 'City required' })}
-        />
-
-        <Controller
-          name="location"
-          control={control}
-          rules={{ required: 'Select location on map' }}
-          render={({ field }) => (
-            <MapPicker label="Store Location" value={field.value} onChange={field.onChange} error={errors.location?.message || ''} />
-          )}
-        />
-
-        <Input
-          label="Store Phone"
-          type="tel"
-          placeholder="Store contact"
-          leftIcon={<Phone size={20} />}
-          error={errors.phone?.message}
-          {...register('phone', {
-            required: 'Phone required',
-            pattern: {
-              value: /^(08|628|\+628)[0-9]{8,11}$/,
-              message: 'Invalid phone'
-            }
-          })}
-        />
-
-        <Controller
-          name='operatingHours'
-          control={control}
-          rules={{required: 'Operating hours required'}}
-          render={({field}) => (
-            <OperatingHoursInput
-              label='Operating hours'
-              value={field.value}
-              onChange={field.onChange}
-              error = {errors.operatingHours?.message}
-            />
-          )}
-        />
-
-        <div className="flex gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={onBack} className="flex-1">
-            ← Back
-          </Button>
-          <Button type="submit" fullWidth isLoading={isLoading} className="flex-1">
-            {isLoading ? 'Saving...' : 'Next Step →'}
-          </Button>   
+        <div className="flex gap-3 mt-6">
+            <Button type="button" variant="outline" onClick={onBack} className="flex-1">
+                ← Back
+            </Button>
+            <Button type="submit" fullWidth isLoading={isLoading} className="flex-1">
+                {isLoading ? 'Saving...' : 'Next Step →'}
+            </Button>
         </div>
-      </form>
+    </form>
     </div>
   );
 }
