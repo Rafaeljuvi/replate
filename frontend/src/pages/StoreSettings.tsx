@@ -154,32 +154,43 @@ export default function StoreSettingsPage(){
     return (
         <div className="min-h-screen bg-primary">
             <div className="bg-white shadow-lg">
-                <div className="max-w-5xl mx-auto px-4 py-4 lg:px-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                leftIcon={<ArrowLeft size={18}/>}
+                <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:px-6">
+                    <div className="grid grid-cols-3 items-center gap-2 sm:gap-3">
+                        
+                        {/* Left: Back + Logo */}
+                        <div className="flex items-center gap-2 sm:gap-4 justify-self-start min-w-0">
+                            <button
                                 onClick={handleBack}
+                                className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-xs sm:text-sm font-medium"
                             >
-                                Back
-                            </Button>
-                            <Logo size="small"/>
+                                <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]"/>
+                                <span className="hidden sm:inline">Back</span>
+                            </button>
+                            <div className="hidden sm:block">
+                                <Logo size="small"/>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <p className="text-xl font-bold text-gray-800">Store Settings</p>
-                            <p className="text-xs text-gray-500">Manage your store information</p>
+
+                        {/* Center: Title */}
+                        <div className="text-center min-w-0 px-1">
+                            <p className="text-sm sm:text-xl font-bold text-gray-800 leading-tight truncate">
+                                Store Settings
+                            </p>
+                            <p className="text-[10px] sm:text-xs text-gray-500 truncate">
+                                Manage your store information
+                            </p>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="small"
-                            leftIcon={<LogOut size={16}/>}
-                            onClick={handleLogout}
-                            className="bg-red-500 text-white  hover:bg-red-50 hover:text-red-500 border border-red-500"
-                        >
-                            Logout
-                        </Button>
+
+                        {/* Right: Logout */}
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-2 bg-red-500 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors border border-red-500"
+                            >
+                                <LogOut size={14} className="sm:w-4 sm:h-4"/>
+                                <span className="hidden sm:inline">Logout</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

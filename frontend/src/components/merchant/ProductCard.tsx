@@ -1,5 +1,4 @@
 import { Package, Edit2, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
-import Button from "../ui/Button";
 import type { Product } from "../../@types";
 
 interface ProductCardProps {
@@ -31,100 +30,82 @@ export default function ProductCard({
 
     const getImageUrl = (imageUrl?: string) => {
         if (!imageUrl) return null;
-    
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
-
-        // Build full URL
-        let fullUrl: string;
-        if (imageUrl.startsWith('http')) {
-            fullUrl = imageUrl;
-        } else {
-            fullUrl = `${API_BASE_URL}${imageUrl}`;
-        }
-    
-        // Debug logs AFTER processing
-        console.log('🖼️ PRODUCT:', product.name);
-        console.log('📁 DB Path:', imageUrl);
-        console.log('🌐 Full URL:', fullUrl);
-    
-        return fullUrl;
+        if (imageUrl.startsWith('http')) return imageUrl;
+        return `${API_BASE_URL}${imageUrl}`;
     };
-    
 
     const imageUrl = getImageUrl(product.image_url);
 
     return (
-        <div className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 ${!product.is_active ? 'opacity-60' : ''}`}>
+        <div className={`bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 sm:p-6 ${!product.is_active ? 'opacity-60' : ''}`}>
 
             {/* Image & Badge */}
-            <div className="relative mb-4">
-                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
+            <div className="relative mb-3 sm:mb-4">
+                <div className="w-full h-32 sm:h-40 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
                     {imageUrl ? (
-                        <img 
-                            src={imageUrl} 
+                        <img
+                            src={imageUrl}
                             alt={product.name}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                                e.currentTarget.src = '';
-                                e.currentTarget.style.display = 'none';
-                            }}
+                            onError={(e) => { e.currentTarget.style.display = 'none' }}
                         />
                     ) : (
-                        <Package size={48} className="text-gray-400" />
+                        <Package size={32} className="text-gray-400 sm:w-12 sm:h-12" />
                     )}
                 </div>
 
                 {/* Active/Inactive Badge */}
-                <span className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold ${
-                    product.is_active 
-                        ? 'bg-green-100 text-green-800' 
+                <span className={`absolute top-2 right-2 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${
+                    product.is_active
+                        ? 'bg-green-100 text-green-800'
                         : 'bg-gray-400 text-white'
                 }`}>
                     {product.is_active ? 'Active' : 'Inactive'}
                 </span>
             </div>
-            
+
             {/* Product Info */}
-            <div className="mb-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">
+            <div className="mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-lg font-bold text-gray-900 mb-1 line-clamp-2 leading-tight">
                     {product.name}
                 </h3>
-                
+
                 {product.description && (
-                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">
                         {product.description}
                     </p>
                 )}
 
                 {product.category && (
-                    <span className="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md mb-2">
+                    <span className="inline-block px-2 py-0.5 sm:py-1 bg-blue-50 text-blue-700 text-[10px] sm:text-xs rounded-md mb-2">
                         {product.category}
                     </span>
                 )}
             </div>
 
             {/* Pricing */}
-            <div className="mb-4">
-                <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl font-bold text-primary">
+            <div className="mb-3 sm:mb-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
+                    <span className="text-base sm:text-2xl font-bold text-primary">
                         {formatCurrency(Number(product.discounted_price))}
                     </span>
                     {product.discount_percentage > 0 && (
-                        <span className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded">
+                        <span className="bg-red-100 text-red-700 text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                             -{product.discount_percentage}%
                         </span>
                     )}
                 </div>
                 {product.discount_percentage > 0 && (
-                    <span className="text-sm text-gray-500 line-through">
+                    <span className="text-xs sm:text-sm text-gray-500 line-through">
                         {formatCurrency(Number(product.original_price))}
                     </span>
                 )}
             </div>
 
             {/* Stock & Availability */}
-            <div className="mb-4 space-y-1">
-                <div className="flex items-center justify-between text-sm">
+            <div className="mb-3 sm:mb-4 space-y-1">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                     <span className="text-gray-600">Stock:</span>
                     <span className={`font-semibold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {product.stock} pcs
@@ -132,52 +113,50 @@ export default function ProductCard({
                 </div>
 
                 {(product.available_from || product.available_until) && (
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Available:</span>
-                        <span className="text-gray-900 font-medium">
+                    <div className="flex items-center justify-between text-xs sm:text-sm gap-1">
+                        <span className="text-gray-600 flex-shrink-0">Available:</span>
+                        <span className="text-gray-900 font-medium text-right whitespace-nowrap">
                             {formatTime(product.available_from)} - {formatTime(product.available_until)}
                         </span>
                     </div>
                 )}
             </div>
 
-            {/* Actions - FIXED: 2 rows */}
-            <div className="flex flex-col gap-2 pt-4 border-t">
+            {/* Actions */}
+            <div className="flex flex-col gap-1.5 sm:gap-2 pt-3 sm:pt-4 border-t">
                 {/* Row 1: Edit & Toggle */}
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="small"
-                        fullWidth
-                        leftIcon={<Edit2 size={16} />}
+                <div className="flex gap-1.5 sm:gap-2">
+                    <button
                         onClick={() => onEdit(product)}
+                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 border border-primary text-primary text-xs sm:text-sm font-semibold rounded-lg hover:bg-green-50 transition-colors"
                     >
+                        <Edit2 size={12} className="sm:w-4 sm:h-4" />
                         Edit
-                    </Button>
+                    </button>
 
-                    <Button
-                        variant={product.is_active ? 'secondary' : 'primary'}
-                        size="small"
-                        fullWidth
-                        leftIcon={product.is_active ? <ToggleLeft size={16} /> : <ToggleRight size={16} />}
+                    <button
                         onClick={() => onToggleActive(product)}
-                        className={!product.is_active ? 'bg-green-600 hover:bg-green-700' : ''}
+                        className={`flex-1 flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors ${
+                            product.is_active
+                                ? 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}
                     >
+                        {product.is_active
+                            ? <ToggleLeft size={12} className="sm:w-4 sm:h-4" />
+                            : <ToggleRight size={12} className="sm:w-4 sm:h-4" />}
                         {product.is_active ? 'Disable' : 'Enable'}
-                    </Button>
+                    </button>
                 </div>
 
                 {/* Row 2: Delete */}
-                <Button
-                    variant="outline"
-                    size="small"
-                    fullWidth
-                    leftIcon={<Trash2 size={16} />}
+                <button
                     onClick={() => onDelete(product)}
-                    className="bg-red-600 text-white border-red-600 hover:bg-red-200 disabled:border-red-600 hover:border-red-200"
+                    className="w-full flex items-center justify-center gap-1 px-2 py-1.5 sm:py-2 bg-red-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors"
                 >
+                    <Trash2 size={12} className="sm:w-4 sm:h-4" />
                     Delete
-                </Button>
+                </button>
             </div>
         </div>
     );

@@ -162,61 +162,63 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-primary">
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-3 items-center gap-4">
-            <div className="justify-self-start">
-              <Logo size="medium" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+          <div className="grid grid-cols-3 items-center gap-2 sm:gap-4">
+           {/* Left: Logo */}
+            <div className="justify-self-start scale-75 sm:scale-100 origin-left">
+              <Logo size="small" />
             </div>
 
-            <div className="flex flex-col items-center text-center">
-              <h1 className="text-3xl font-bold text-gray-900">
+            {/* Center: Title */}
+            <div className="flex flex-col items-center text-center min-w-0 px-1">
+              <h1 className="text-sm sm:text-3xl font-bold text-gray-900 leading-tight truncate">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-[10px] sm:text-base text-gray-600 mt-0.5 sm:mt-1 truncate">
                 Welcome back, {user?.name}
               </p>
             </div>
-    
-            <div className="flex gap-3 justify-self-end">
-              <Button
-                variant="outline"
-                leftIcon={<RefreshCw size={18} />}
+
+            {/* Right: Refresh + Logout - Native buttons */}
+            <div className="flex gap-1.5 sm:gap-3 justify-self-end">
+              <button
                 onClick={handleRefresh}
+                className="flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-4 sm:py-2 border border-gray-200 text-gray-700 text-xs sm:text-base font-semibold rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Refresh
-              </Button>
-              
-              <Button
-                variant="secondary"
-                leftIcon={<LogOut size={18} />}
+                <RefreshCw size={14} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+
+              <button
                 onClick={handleLogout}
-                className="border-2 border-red-500 bg-white text-red-500 hover:bg-red-500 disabled:bg-white hover:text-white disabled:text-red-500"
+                className="flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-4 sm:py-2 border-2 border-red-500 bg-white text-red-500 text-xs sm:text-base font-semibold rounded-lg hover:bg-red-500 hover:text-white transition-colors"
               >
-                Logout
-              </Button>
+                <LogOut size={14} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-xl font-bold text-white mb-3 sm:mb-4">
             Platform Statistics
           </h2>
 
           {isLoadingStats ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
-                  <div className="h-12 w-12 bg-gray-200 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                <div key={i} className="bg-white rounded-lg shadow p-4 sm:p-6 animate-pulse">
+                  <div className="h-12 wh-10 w-10 sm:h-12 sm:w-12 bg-gray-200 rounded-lg mb-3 sm:mb-4"></div>
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-6 sm:h-8 bg-gray-200 rounded w-3/4"></div>
                 </div>
               ))}
             </div>
           ) : stats ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               <StatsCard
                 title="Total Customers"
                 value={stats.total_customers}
@@ -264,11 +266,11 @@ export default function AdminDashboard() {
         </div>
 
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-white">
+          <div className="flex justify-between items-center mb-3 sm:mb-4 gap-2">
+            <h2 className="text-base sm:text-xl font-bold text-white">
               Pending Store Applications
             </h2>
-            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded-full">
+            <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 bg-yellow-100 text-yellow-800 text-xs sm:text-sm font-semibold rounded-full whitespace-nowrap flex-shrink-0">
               {pendingStores.length} pending
             </span>
           </div>
@@ -287,12 +289,12 @@ export default function AdminDashboard() {
               ))}
             </div>
           ) : pendingStores.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-lg shadow p-6 sm:p-12 text-center">
+              <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-500 mx-auto mb-3 sm:mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 All Caught Up!
               </h3>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 There are no pending store applications at the moment.
               </p>
             </div>

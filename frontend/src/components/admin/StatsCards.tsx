@@ -18,22 +18,22 @@ export default function StatsCard ({title, value, icon: Icon, color, subtitle}: 
     };
 
     return (
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
-                    <Icon className="w-6 h-6"/>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`p-2 sm:p-3 rounded-lg ${colorClasses[color]}`}>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6"/>
                 </div>
             </div>
 
             <div>
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-xs sm:text-sm text-gray-600 mb-1">
                     {title}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-xl sm:text-3xl font-bold text-gray-900 break-words leading-tight">
                     {value}
                 </p>
                 {subtitle && (
-                    <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500 mt-1">{subtitle}</p>
                 )}
             </div>
         </div>

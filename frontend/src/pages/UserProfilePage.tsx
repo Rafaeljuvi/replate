@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import CustomerHeader from "../components/customer/CustomerHeader";
 import { updateProfile, changePassword, setUser as saveUser } from '../services/api'
+import CustomerFooter from "../components/layout/Footer";
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -418,6 +419,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
             )}
+            <CustomerFooter />
         </div>
     )
 }

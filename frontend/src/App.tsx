@@ -22,6 +22,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import ActiveOrdersPage from './pages/ActiveOrdersPage';
 import OrderHistoryPage from './pages/OrderHistory';
 import ProfilePage from './pages/UserProfilePage';
+import AboutPage from './pages/AboutPage';
 
 
 // MERCHANT PAGES
@@ -165,9 +166,9 @@ function App() {
               <ProfilePage/>
             </ProtectedRoute>
           }>
-
-
           </Route>
+
+          <Route path='/about' element={<AboutPage/>}/>
 
           {/* ========================================
               MERCHANT ROUTES (Protected)

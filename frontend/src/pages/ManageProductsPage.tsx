@@ -161,46 +161,53 @@ export default function ManageProductsPage() {
 
     return (
         <div className="min-h-screen bg-secondary">
-            {/* header */}
+           {/* header */}
             <div className="bg-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 py-6 lg:px-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items center gap-4">
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                leftIcon={<ArrowLeft size={18} />}
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-6 lg:px-6">
+                    <div className="grid grid-cols-3 items-center gap-2 sm:gap-3">
+                        
+                        {/* Left: Back + Logo */}
+                        <div className="flex items-center gap-2 sm:gap-4 justify-self-start min-w-0">
+                            <button
                                 onClick={() => navigate('/merchant/dashboard')}
+                                className="flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-xs sm:text-sm font-medium"
                             >
-                                Back
-                            </Button>
-                            <Logo size="small"/>
+                                <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px]"/>
+                                <span className="hidden sm:inline">Back</span>
+                            </button>
+                            <div className="scale-75 sm:scale-100 origin-left hidden sm:block">
+                                <Logo size="small"/>
+                            </div>
                         </div>
-                        <div className="text-center">
-                            <h1 className="text-2xl font-bold text-gray-800"> Manage Products </h1>
-                            <p className="text-sm text-gray-600">
+
+                        {/* Center: Title */}
+                        <div className="text-center min-w-0 px-1">
+                            <h1 className="text-sm sm:text-2xl font-bold text-gray-800 leading-tight truncate">
+                                Manage Products
+                            </h1>
+                            <p className="text-[10px] sm:text-sm text-gray-600 truncate">
                                 {products.length} {products.length !== 1 ? 'products' : 'product'}
                             </p>
                         </div>
-                        <div className="flex gap-3">
-                            <Button
-                                variant="outline"
-                                size="small"
-                                leftIcon={<RefreshCcw size={16} className={isRefreshing ? 'animate-spin' : ''}/>}
+
+                        {/* Right: Refresh + Add Product */}
+                        <div className="flex justify-end gap-1.5 sm:gap-3">
+                            <button
                                 onClick={handleRefresh}
                                 disabled={isRefreshing}
+                                className="flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-2 border border-gray-200 text-gray-700 text-xs sm:text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                             >
-                                Refresh
-                            </Button>
+                                <RefreshCcw size={14} className={`sm:w-4 sm:h-4 ${isRefreshing ? 'animate-spin' : ''}`}/>
+                                <span className="hidden sm:inline">Refresh</span>
+                            </button>
 
-                            <Button
-                                variant="primary"
-                                size="small"
-                                leftIcon={<Plus size={18}/>}
+                            <button
                                 onClick={openCreateModal}
+                                className="flex items-center justify-center sm:gap-1.5 w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-2 bg-primary text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-green-600 transition-colors"
                             >
-                                Add Product
-                            </Button>
+                                <Plus size={16} className="sm:w-[18px] sm:h-[18px]"/>
+                                <span className="hidden sm:inline">Add Product</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -302,8 +309,8 @@ export default function ManageProductsPage() {
                                             size="medium"
                                             fullWidth
                                             leftIcon={<ShoppingBag size={18}/>}
-                                            disabled
                                             className="justify-start hover:bg-gray-50"
+                                            onClick={() => navigate('/merchant/orders')}
                                         >   
                                             View Orders
                                         </Button>
@@ -344,7 +351,7 @@ export default function ManageProductsPage() {
                         </Button>
                     </div>
                     ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                         {products.map((product) => (
                             <ProductCard
                                 key={product.product_id}

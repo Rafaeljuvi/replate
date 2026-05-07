@@ -36,7 +36,7 @@ export default function ActiveOrdersPage() {
             ]);
             setOrders([...pending, ...confirmed, ...ready])
         } catch (error: any) {
-            toast.error('Failed to load orers')
+            toast.error('Failed to load orders')
         } finally {
             setIsLoading(false);
         }
@@ -146,9 +146,9 @@ export default function ActiveOrdersPage() {
     }
 
     return (
-        <div className="min-h-screen bg-secondary">
+        <div className="min-h-screen bg-secondary flex flex-col">
             <CustomerHeader/>
-            <div className="max-w-3xl mx-auto px-4 py-6">
+            <div className="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
 
                 {/* Header card */}
                 <div className="bg-white rounded-2xl px-6 py-4 shadow-sm mb-6 flex items-center gap-3">
@@ -248,7 +248,7 @@ export default function ActiveOrdersPage() {
                                             }`}>
                                                 {order.payment_status === 'paid' ? 'Paid' : 'Unpaid'}
                                             </span>
-                                            <span className="text-xs texg-gray-400">
+                                            <span className="text-xs text-gray-400">
                                                 {order.payment_method === 'cash' ? 'Cash' : 'Online'}
                                             </span>
                                         </div>
@@ -261,13 +261,13 @@ export default function ActiveOrdersPage() {
                                         )}
                                     </div>
 
-                                    <div className="px-5 pb-4 flex gap-2">
+                                    <div className="px-5 pb-4 flex flex-col sm:flex-row gap-2">
 
                                         {isPendingPayment && (
                                             <button
                                                 onClick={() => handleCompletePayment(order)}
                                                 disabled={payingId === order.order_id}
-                                                className="flex-1 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                                                className="w-full sm:flex-1 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
                                             >
                                                 {payingId === order.order_id
                                                     ? <><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>Loading...</>
@@ -334,7 +334,7 @@ export default function ActiveOrdersPage() {
                                         src={selectedOrder.order.store_logo.startsWith('http')
                                             ? selectedOrder.order.store_logo
                                             : `${API_BASE_URL}${selectedOrder.order.store_logo}`}
-                                        alt={selectedOrder.order.store_logo}
+                                        alt={selectedOrder.order.store_name}
                                         className="w-12 h-12 rounded-xl object-cover"
                                     />
                                     : <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center">
@@ -425,7 +425,7 @@ export default function ActiveOrdersPage() {
                         <div className="px-6 pb-5">
                             <button
                                 onClick={() => setSelectedOrder(null)}
-                                className="w-full py-3 border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                                className="w-full py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
                             >
                                 Close
                             </button>

@@ -100,15 +100,13 @@ export default function CustomerHomePage() {
             />
                     
             {/* Main */}
-            <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:py-6 mt-2">
 
                 {/* Search Card */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm mb-6 border border-gray-100">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div>
-                            <h2 className="text-3xl font-bold text-secondary">Good food deserves a second chance</h2>
-                            <p className="text-sm text-gray-400">Get quality bakery products at a discounted price before the store closes.</p>
-                        </div>
+                <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm mb-6 border border-gray-100">
+                    <div className="mb-4">  
+                        <h2 className="text-xl sm:text-3xl font-bold text-secondary">Good food deserves a second chance</h2>
+                        <p className="text-sm text-gray-400 mt-1">Get quality bakery products at a discounted price before the store closes.</p>
                     </div>
                     <div className="relative">
                         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -240,7 +238,7 @@ export default function CustomerHomePage() {
                         </div>
 
                         {/* Products Found + Category Filter */}
-                        <div className="flex items-center gap-3 mb-4 flex-wrap">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-4">
                             <div className="bg-white rounded-xl px-4 py-2 shadow-sm flex items-center gap-2 flex-shrink-0">
                                 <span className="w-2 h-2 rounded-full bg-primary"></span>
                                 <p className="text-sm font-medium text-gray-700">
@@ -248,12 +246,12 @@ export default function CustomerHomePage() {
                                     {locationStatus === 'granted' ? ' near you' : ''}
                                 </p>
                             </div>
-                            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                            <div className="flex gap-2 overflow-x-auto scrollbar-hide w-full sm:w-auto pb-1">
                                 {CATEGORIES.map((cat) => (
                                     <button
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
-                                        className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                                        className={`flex-shrink-0 px-3 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                                             selectedCategory === cat
                                                 ? 'bg-primary text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -299,7 +297,7 @@ export default function CustomerHomePage() {
                             </div>
 
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5 mb-6">
                                 {filteredProducts.map((product) => (
                                     <CustomerProductCard
                                         key={product.product_id}

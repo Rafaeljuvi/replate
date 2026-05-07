@@ -142,36 +142,34 @@ export default function MerchantDashboard() {
       
       {/* ==================== HEADER ==================== */}
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-6">
+          <div className="grid grid-cols-3 items-center gap-2 sm:gap-3">
             
             {/* Left: Logo */}
-            <div>
-              <Logo size="small"/>
+            <div className="justify-self-start scale-75 sm:scale-100 origin-left">
+              <Logo size="small"/>  
             </div>
 
-            {/* Center: Title */}
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-800">Merchant Dashboard</h1>
-              <p className="text-sm text-gray-600">Welcome back, {user?.name}</p>
+            {/* Center: Title - benar-benar di tengah */}
+            <div className="text-center min-w-0 px-1">
+              <h1 className="text-sm sm:text-2xl font-bold text-gray-800 leading-tight truncate">Merchant Dashboard</h1>
+              <p className="text-[10px] sm:text-sm text-gray-600 truncate">Welcome back, {user?.name}</p>
             </div>
 
-            {/* Right: Buttons */}
-            <div className="flex justify-end gap-3">
-              <Button
-                variant="outline"
-                size="small"
-                leftIcon={<RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />}
+            {/* Right: Refresh Button - native button supaya bisa dikecilin */}
+            <div className="justify-self-end">
+              <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2 border border-primary text-primary text-xs sm:text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
+                <RefreshCw size={14} className={`sm:w-4 sm:h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Refresh
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       </div>
-
       {/* ==================== MAIN CONTENT ==================== */}
       <div className="max-w-7xl mx-auto px-4 py-8">
 
@@ -232,7 +230,7 @@ export default function MerchantDashboard() {
           <p className="text-lg font-bold text-white mb-4">Statistics Overview</p>
           
           {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
               
               {/* Total Products */}
               <StatsCard

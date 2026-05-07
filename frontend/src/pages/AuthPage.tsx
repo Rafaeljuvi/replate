@@ -27,7 +27,6 @@ export default function LoginPage() {
   const [showResendVerfication, setShowResendVerification] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const[isResending, setIsResending] = useState(false);
-  
 
   // Form for Sign In
   const {
@@ -558,7 +557,7 @@ export default function LoginPage() {
             </div>
 
             {/* Social Register */}
-            <div className="flex justify-center w-ful">
+            <div className="flex justify-center w-full">
               <GoogleLogin
                 onSuccess={handleGoogleRegister}
                 onError={handleGoogleError}
