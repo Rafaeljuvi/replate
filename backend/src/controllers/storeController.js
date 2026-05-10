@@ -143,7 +143,7 @@ const updateMerchantStore = async (req, res) => {
          if(city !== undefined) {fieldsToUpdate.push(`city = $${paramCount++}`); values.push(city)}
          if(phone !== undefined) {fieldsToUpdate}
          if(operating_hours !==  undefined) {fieldsToUpdate.push(`operating_hours = $${paramCount++}`); values.push(operating_hours)}
-         if(req.file) {fieldsToUpdate.push(`logo_url = $${paramCount++}`); values.push(`/uploads/merchant/logos/${req.file.filename}`)}
+         if(req.file) {fieldsToUpdate.push(`logo_url = $${paramCount++}`); values.push(req.file.path)}
 
          if(fieldsToUpdate.length === 0) {
             return res.status(400).json({success: false, message: 'No fields to update.'})

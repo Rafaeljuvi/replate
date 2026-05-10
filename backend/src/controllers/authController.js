@@ -366,16 +366,14 @@ const registerStoreInfo = async (req, res) => {
 
 // Register Merchant Verfication
 // Page 3
-const registerStoreVerification = async (req, res) => {
-    console.log('req.files:', req.files); // ← tambahkan
-    console.log('req.body:', req.body);   
+const registerStoreVerification = async (req, res) => {  
     try {
         const merchantID = req.user.userId;
 
         let idCardImageUrl = null;
 
        if(req.files && req.files.idCardImage && req.files.idCardImage.length > 0) {
-        idCardImageUrl = `/uploads/merchant/id-cards/${req.files.idCardImage[0].filename}`;
+        idCardImageUrl = req.files.idCardImage[0].path;
        }
 
         if(!idCardImageUrl) {

@@ -74,7 +74,7 @@ const createProduct = async (req, res) => {
         //Handle image upload
         let image_url = null;
         if(req.file) {
-            image_url = `/uploads/products/${req.file.filename}`;
+            image_url = req.file.path;
         }
 
         // Insert product
@@ -337,7 +337,7 @@ const updateProduct = async (req, res) => {
         }
         if (req.file) {
             fieldsToUpdate.push(`image_url = $${paramCount++}`);
-            values.push(`/uploads/products/${req.file.filename}`);
+            values.push(req.file.path);
         }
         if (image_url !== undefined) {
             fieldsToUpdate.push(`image_url = $${paramCount++}`);

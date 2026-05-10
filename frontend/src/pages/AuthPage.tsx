@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {  useForm } from 'react-hook-form';
 import { Mail, Lock, User, Phone, CheckCircle } from 'lucide-react';
@@ -27,6 +27,30 @@ export default function LoginPage() {
   const [showResendVerfication, setShowResendVerification] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const[isResending, setIsResending] = useState(false);
+
+  // Responsive width untuk Google button - mengukur container parent
+  const googleBtnSignInRef = useRef<HTMLDivElement>(null);
+  const googleBtnRegisterRef = useRef<HTMLDivElement>(null);
+  const [googleBtnWidth, setGoogleBtnWidth] = useState('384');
+
+  useEffect(() => {
+    const updateWidth = () => {
+      const activeRef = activeTab === 'signin' ? googleBtnSignInRef : googleBtnRegisterRef;
+      if (activeRef.current) {
+        const width = activeRef.current.offsetWidth;
+        // Kurangi 32px (16px tiap sisi) untuk inset dari tembok card
+        const adjustedWidth = width - 32;
+        setGoogleBtnWidth(String(Math.min(adjustedWidth, 400)));
+      }
+    };
+
+    const timer = setTimeout(updateWidth, 50);
+    window.addEventListener('resize', updateWidth);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, [activeTab]);
 
   // Form for Sign In
   const {
@@ -423,7 +447,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex justify-center w-full">
+            <div ref={googleBtnSignInRef} className="w-full flex justify-center">
               <GoogleLogin
                 onSuccess={handleGoogleLogin}
                 onError={handleGoogleError}
@@ -431,7 +455,7 @@ export default function LoginPage() {
                 theme="outline"
                 size="large"
                 text="signin_with"
-                width="384"
+                width={googleBtnWidth}
               />
             </div>
 
@@ -557,7 +581,7 @@ export default function LoginPage() {
             </div>
 
             {/* Social Register */}
-            <div className="flex justify-center w-full">
+            <div ref={googleBtnRegisterRef} className="w-full flex justify-center">
               <GoogleLogin
                 onSuccess={handleGoogleRegister}
                 onError={handleGoogleError}
@@ -565,7 +589,7 @@ export default function LoginPage() {
                 theme="outline"
                 size="large"
                 text="signin_with"
-                width="384"
+                width={googleBtnWidth}
               />
             </div>
 

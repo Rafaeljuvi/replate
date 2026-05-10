@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
-    ArrowLeft, Leaf, Heart, Users, Store, ShoppingBag, CheckCircle, Target, Sparkles, TrendingDown, Globe, Search, CreditCard, MapPin
+    ArrowLeft, Leaf, Heart, Users, Store, CheckCircle, Target, Sparkles, TrendingDown, Globe, CreditCard
 } from 'lucide-react'
 import CustomerHeader from "../components/customer/CustomerHeader";
 import CustomerFooter from "../components/layout/Footer";
-import Logo from "../components/layout/Logo";
 
 export default function AbouPage(){
     const navigate = useNavigate();

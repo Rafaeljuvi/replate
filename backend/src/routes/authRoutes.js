@@ -25,7 +25,6 @@ router.post('/register/store/merchant', RegisterMerchant);
 router.post('/register/store/info', verifyToken, registerStoreInfo);
 router.post('/register/store/verification', verifyToken,
    uploadMerchantImages.fields([
-        {name: 'qrisImage', maxCount: 1},
         {name: 'idCardImage', maxCount: 1}
     ]),
     registerStoreVerification
