@@ -1,9 +1,8 @@
-const brevo = require('@getbrevo/brevo');
+const axios = require('axios');
 require('dotenv').config();
 
-// Configure Brevo HTTP API client
-const apiInstance = new brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+// Brevo HTTP API endpoint
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 const SENDER = {
     name: 'Replate - Bakery Marketplace',
@@ -13,17 +12,32 @@ const SENDER = {
 // Helper function untuk kirim email via Brevo HTTP API
 const sendEmail = async (to, name, subject, html) => {
     try {
-        const sendSmtpEmail = new brevo.SendSmtpEmail();
-        sendSmtpEmail.sender = SENDER;
-        sendSmtpEmail.to = [{ email: to, name: name || to }];
-        sendSmtpEmail.subject = subject;
-        sendSmtpEmail.htmlContent = html;
+        const response = await axios.post(
+            BREVO_API_URL,
+            {
+                sender: SENDER,
+                to: [{ email: to, name: name || to }],
+                subject: subject,
+                htmlContent: html
+            },
+            {
+                headers: {
+                    'accept': 'application/json',
+                    'content-type': 'application/json',
+                    'api-key': process.env.BREVO_API_KEY
+                },
+                timeout: 10000 // 10 detik timeout
+            }
+        );
 
-        const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log(`Email sent to: ${to}, MessageId: ${response.body?.messageId || 'unknown'}`);
+        console.log(`Email sent to: ${to}, MessageId: ${response.data?.messageId || 'unknown'}`);
         return true;
     } catch (error) {
-        console.error('Error sending email:', error.message || error);
+        if (error.response) {
+            console.error('Brevo API error:', error.response.status, error.response.data);
+        } else {
+            console.error('Error sending email:', error.message);
+        }
         return false;
     }
 };
