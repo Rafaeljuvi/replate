@@ -1,44 +1,29 @@
-const nodemailer = require('nodemailer');
+const brevo = require('@getbrevo/brevo');
 require('dotenv').config();
 
-// Brevo SMTP configuration
-const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_KEY
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+// Configure Brevo HTTP API client
+const apiInstance = new brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
-// Verify connection at startup
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('Email transporter error:', error.message);
-    } else {
-        console.log('Email server ready to send messages');
-    }
-});
+const SENDER = {
+    name: 'Replate - Bakery Marketplace',
+    email: process.env.BREVO_SENDER_EMAIL
+};
 
-const FROM_EMAIL = `"Replate - Bakery Marketplace" <${process.env.BREVO_SENDER_EMAIL}>`;
-
-// Helper function
-const sendEmail = async (to, subject, html) => {
+// Helper function untuk kirim email via Brevo HTTP API
+const sendEmail = async (to, name, subject, html) => {
     try {
-        const info = await transporter.sendMail({
-            from: FROM_EMAIL,
-            to: to,
-            subject: subject,
-            html: html
-        });
-        console.log(`Email sent to: ${to}, ID: ${info.messageId}`);
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
+        sendSmtpEmail.sender = SENDER;
+        sendSmtpEmail.to = [{ email: to, name: name || to }];
+        sendSmtpEmail.subject = subject;
+        sendSmtpEmail.htmlContent = html;
+
+        const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log(`Email sent to: ${to}, MessageId: ${response.body?.messageId || 'unknown'}`);
         return true;
     } catch (error) {
-        console.error('Error sending email:', error.message);
+        console.error('Error sending email:', error.message || error);
         return false;
     }
 };
@@ -96,7 +81,7 @@ const sendVerificationEmail = async (email, name, verificationToken, userType = 
         </div>
     `;
 
-    return await sendEmail(email, 'Verify Your Email - Replate', html);
+    return await sendEmail(email, name, 'Verify Your Email - Replate', html);
 };
 
 const resendVerificationEmail = async (email, name, verificationToken, userType = 'user') => {
@@ -147,7 +132,7 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
         </div>
     `;
 
-    return await sendEmail(email, 'Reset Your Password - Replate', html);
+    return await sendEmail(email, name, 'Reset Your Password - Replate', html);
 };
 
 const sendMerchantApprovalEmail = async (email, name, storeName) => {
@@ -197,7 +182,7 @@ const sendMerchantApprovalEmail = async (email, name, storeName) => {
         </div>
     `;
 
-    return await sendEmail(email, 'Congratulations! Your Store is Approved - Replate', html);
+    return await sendEmail(email, name, 'Congratulations! Your Store is Approved - Replate', html);
 };
 
 const sendMerchantRejectionEmail = async (email, name, storeName, rejectionReason) => {
@@ -238,7 +223,7 @@ const sendMerchantRejectionEmail = async (email, name, storeName, rejectionReaso
         </div>
     `;
 
-    return await sendEmail(email, 'Update on Your Store Application - Replate', html);
+    return await sendEmail(email, name, 'Update on Your Store Application - Replate', html);
 };
 
 module.exports = {
