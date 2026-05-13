@@ -1,27 +1,41 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Brevo SMTP configuration
+const transporter = nodemailer.createTransport({
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_KEY
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
 
-// Email sender - pakai default Resend untuk testing
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Replate <onboarding@resend.dev>';
+// Verify connection at startup
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('Email transporter error:', error.message);
+    } else {
+        console.log('Email server ready to send messages');
+    }
+});
 
-// Helper untuk kirim email
+const FROM_EMAIL = `"Replate - Bakery Marketplace" <${process.env.BREVO_SENDER_EMAIL}>`;
+
+// Helper function
 const sendEmail = async (to, subject, html) => {
     try {
-        const { data, error } = await resend.emails.send({
+        const info = await transporter.sendMail({
             from: FROM_EMAIL,
-            to: [to],
+            to: to,
             subject: subject,
-            html: html,
+            html: html
         });
-
-        if (error) {
-            console.error('Resend error:', error);
-            return false;
-        }
-
-        console.log(`Email sent to: ${to}, ID: ${data?.id}`);
+        console.log(`Email sent to: ${to}, ID: ${info.messageId}`);
         return true;
     } catch (error) {
         console.error('Error sending email:', error.message);
@@ -85,12 +99,10 @@ const sendVerificationEmail = async (email, name, verificationToken, userType = 
     return await sendEmail(email, 'Verify Your Email - Replate', html);
 };
 
-// Resend verification email
 const resendVerificationEmail = async (email, name, verificationToken, userType = 'user') => {
     return await sendVerificationEmail(email, name, verificationToken, userType);
 };
 
-// Send password reset email
 const sendPasswordResetEmail = async (email, name, resetToken) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
@@ -138,7 +150,6 @@ const sendPasswordResetEmail = async (email, name, resetToken) => {
     return await sendEmail(email, 'Reset Your Password - Replate', html);
 };
 
-// Send merchant approval email
 const sendMerchantApprovalEmail = async (email, name, storeName) => {
     const loginUrl = `${process.env.FRONTEND_URL}/login`;
 
@@ -150,7 +161,7 @@ const sendMerchantApprovalEmail = async (email, name, storeName) => {
             </div>
 
             <div style="background-color: #E8F5E9; border-left: 4px solid #2D7A5E; padding: 20px; margin-bottom: 20px;">
-                <h2 style="color: #2D7A5E; margin: 0 0 10px 0;">🎉 Congratulations!</h2>
+                <h2 style="color: #2D7A5E; margin: 0 0 10px 0;">Congratulations!</h2>
                 <p style="color: #333; margin: 0; font-size: 16px;">
                     Your store has been approved and is now live on Replate!
                 </p>
@@ -189,7 +200,6 @@ const sendMerchantApprovalEmail = async (email, name, storeName) => {
     return await sendEmail(email, 'Congratulations! Your Store is Approved - Replate', html);
 };
 
-// Send merchant rejection email
 const sendMerchantRejectionEmail = async (email, name, storeName, rejectionReason) => {
     const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
