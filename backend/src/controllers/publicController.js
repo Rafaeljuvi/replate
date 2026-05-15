@@ -51,8 +51,8 @@ const getPublicProducts = async (req, res) =>{
                         p.available_from IS NULL
                         OR p.available_until IS NULL
                         OR (
-                            CURRENT_TIME::time >= p.available_from::time
-                            AND CURRENT_TIME::time <= p.available_until::time
+                            (CURRENT_TIME AT TIME ZONE 'Asia/Jakarta')::time >= p.available_from::time
+                            AND (CURRENT_TIME AT TIME ZONE 'Asia/Jakarta')::time <= p.available_until::time
                             )
                         )
                 `;
@@ -311,11 +311,11 @@ const getPublicStoreById = async (req, res) => {
                 s.logo_url as store_logo,
                 s.average_rating,
                 CASE 
-                    WHEN p.available_from IS NULL OR p.available_until IS NULL THEN true
-                    WHEN CURRENT_TIME::time >= p.available_from::time 
-                        AND CURRENT_TIME::time <= p.available_until::time THEN true
-                    ELSE false
-                END as is_available_now
+                WHEN p.available_from IS NULL OR p.available_until IS NULL THEN true
+                WHEN (CURRENT_TIME AT TIME ZONE 'Asia/Jakarta')::time >= p.available_from::time 
+                    AND (CURRENT_TIME AT TIME ZONE 'Asia/Jakarta')::time <= p.available_until::time THEN true
+                ELSE false
+            END as is_available_now
             FROM products p
             INNER JOIN stores s ON p.store_id = s.store_id
             WHERE p.store_id = $1
