@@ -179,10 +179,10 @@ export default function MerchantDashboard() {
             <div className="flex items-start justify-between">
               <div className='flex items-start gap-4'>
 
-                <div className='w-16 h-16 rounded-full border=2 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0'>
+                <div className='w-16 h-16 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0'>
                   {store.logo_url 
                     ? <img
-                        src={`${API_BASE_URL}${store.logo_url}`}
+                        src={store.logo_url.startsWith('http') ? store.logo_url : `${API_BASE_URL}${store.logo_url}`}
                         alt='Store logo'
                         className='w-full h-full object-cover'
                         />

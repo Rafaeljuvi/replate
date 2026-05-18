@@ -77,7 +77,9 @@ export default function StoreSettingsPage(){
             bank_account_number: data.bank_account_number || ''
         });
         if(data.logo_url) {
-            setLogoPreview(`${API_BASE_URL}${data.logo_url}`);
+            setLogoPreview(data.logo_url.startsWith('http') 
+            ? data.logo_url 
+            : `${API_BASE_URL}${data.logo_url}`);
         } else {
             setLogoPreview(null);
         }
